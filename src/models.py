@@ -69,7 +69,8 @@ class AdminUser(db.Model):
     social = db.Column(db.String(250), nullable=False)
     imagen = db.Column(db.String(250), nullable=False)
     detalle = db.Column(db.String(250), nullable=False)
-
+    evaluate_status = db.Column(db.Boolean, nullable=False)
+    
     def __repr__(self):
         return f'<Admin> f{self.nombre}'
 
@@ -90,26 +91,28 @@ class TipoServicio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     proveedor_id= db.Column(db.Integer, db.ForeignKey('user.id') )
     status_active = db.Column(db.Boolean, nullable=False)
-    nombre = db.Column(db.String(250), nullable=False)
-    detalle = db.Column(db.String(250), nullable=False)
+    nombre_tipo_servicio = db.Column(db.String(250), nullable=False)
+    nombre_tipo_sub_servicio = db.Column(db.String(250), nullable=False)
+    detalle_tipo_servicio = db.Column(db.String(250), nullable=False)
  #   nature_planet = db.relationship('Planet', backref="nature", uselist=True)
     user_proveedor = db.relationship('User', backref="tipo_servicio", uselist=False)  
     __table_args__ = (db.UniqueConstraint(
-	"id","proveedor_id","detalle",
+	"id","proveedor_id","nombre_tipo_servicio","nombre_tipo_sub_servicio","detalle_tipo_servicio","status_active",
 	name="debe_tener_una_sola_coincidencia"
     ),)
 
 
     def __repr__(self):
-        return f'<Tipo de Servicio> f{self.nombre}'
+        return f'<Tipo de Servicio> f{self.nombre_tipo_servicio}'
 
     def serialize(self):
         return{
             "id":self.id,
             "proveedor_id":self.proveedor_id,
             "status_active":self.status_active,
-            "nombre":self.nombre,
-            "detalle":self.detalle,
+            "nombre":self.nombre_tipo_servicio,
+            "sub_servicio":self.nombre_tipo_sub_servicio,
+            "detalle":self.detalle_tipo_servicio,
         }
 
     def __init__(self, *args, **kwargs):
@@ -148,91 +151,7 @@ class TipoServicio(db.Model):
             print(error.args)
 
 
-class TipoSubServicio(db.Model):
-    __tablename__ = 'tipo_sub_servicio'
-    # Here we define columns for the table person
-    # Notice that each db.Column is also a normal Python instance attribute.
-    id = db.Column(db.Integer, primary_key=True)
-    tipo_servicio_id= db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
-    status_activo = db.Column(db.Boolean, nullable=False)
-    detalle = db.Column(db.String(250), nullable=False)
-    nombre = db.Column(db.String(250), nullable=False)
-    tipo_servicio = db.relationship('TipoServicio', backref="tipo_sub_servicio", uselist=False)  
 
-    def __repr__(self):
-        return f'<Tipo de SubServicio> f{self.nombre}'
-
-    def serialize(self):
-        return{
-            "id":self.id,
-            "tipo_servicio_id":self.tipo_servicio_id,
-            "status_activo":self.status_activo,
-            "nombre":self.nombre,
-        }
-
-    def __init__(self, *args, **kwargs):
-        """
-            "name":"andres",
-            "lastname":"rodriguez"
-
-
-        """
-      
-
-        for (key, value) in kwargs.items():
-            if hasattr(self, key):
-                attr_type = getattr(self.__class__, key).type
-
-                try:
-                    attr_type.python_type(value)
-                    setattr(self, key, value)
-                except Exception as error:
-                    print(f"Ignore the rest: {error.args}")
-
-
-class DetalleServicio(db.Model):
-    __tablename__ = 'detalle_servicio'
-    # Here we define columns for the table person
-    # Notice that each db.Column is also a normal Python instance attribute.
-    id = db.Column(db.Integer, primary_key=True)
-    tipo_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_sub_servicio.id') )
-    evaluate_status = db.Column(db.Boolean, nullable=False)
-    detalle = db.Column(db.String(250), nullable=False)
-    nombre = db.Column(db.String(250), nullable=False)
-    tipo_sub_servicio = db.relationship('TipoSubServicio', backref="tipo_sub_servicio", uselist=False)     
-
-
-    def __repr__(self):
-        return f'<Detalles del Servicio> f{self.nombre}'
-
-    def serialize(self):
-        return{
-            "id":self.id,
-            "nombre":self.nombre,
-            "tipo_servicio_id":self.tipo_servicio_id,
-            "evaluate_status":self.evaluate_status,
-            "tipo_sub_servicio":self.tipo_sub_servicio,
-            "detalle":self.detalle,
-        }
-
-    def __init__(self, *args, **kwargs):
-        """
-            "name":"andres",
-            "lastname":"rodriguez"
-
-
-        """
-      
-
-        for (key, value) in kwargs.items():
-            if hasattr(self, key):
-                attr_type = getattr(self.__class__, key).type
-
-                try:
-                    attr_type.python_type(value)
-                    setattr(self, key, value)
-                except Exception as error:
-                    print(f"Ignore the rest: {error.args}")
 
 class EvaluacionProveedor(db.Model):
     __tablename__ = 'evaluacion_proveedor'
@@ -241,12 +160,12 @@ class EvaluacionProveedor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     comentario = db.Column(db.String(250), nullable=False)
     evaluate_status = db.Column(db.Boolean, nullable=False)
-    detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('detalle_servicio.id') )
+    detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
     user_id= db.Column(db.Integer, db.ForeignKey('user.id') )
     resultado_evaluacion= db.Column(db.Float, nullable=False)
     cliente_evaluador = db.relationship('User', backref="cliente_evaluador", uselist=False) 
     proveedor_evaluado = db.relationship('User', backref="proveedor_evaluado", uselist=False)   
-    detalle_servicio = db.relationship('DetalleServicio', backref="detalle_servicio", uselist=False)
+    detalle_servicio_evaluado = db.relationship('TipoServicio', backref="detalle_servicio_evaluado", uselist=False)
 
 
     def __repr__(self):
@@ -257,8 +176,8 @@ class EvaluacionProveedor(db.Model):
             "id":self.id,
             "comentario":self.comentario,
             "evaluate_status":self.evaluate_status,
-            "proveedor_id":self.proveedor_id,
-            "cliente_id":self.cliente_id,
+            "proveedor_id":self.proveedor_evaluado,
+            "cliente_id":self.cliente_evaluador,
             "resultado_evaluacion":self.resultado_evaluacion,
         }
 
@@ -292,12 +211,12 @@ class OrdenServicio(db.Model):
     status_orden_recibido = db.Column(db.Boolean, nullable=False)
     status_orden_cancelada = db.Column(db.Boolean, nullable=False)
     status_orden_aceptada = db.Column(db.Boolean, nullable=False)
-    status_orden_progreso = db.Column(db.Boolean, nullable=False)
-    detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('detalle_servicio.id') )
+    status_orden_progreso = db.Column(db.Boolean, nullable=False) 
+    detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
     user_id= db.Column(db.Integer, db.ForeignKey('user.id') ) 
     orden_cliente = db.relationship('User', backref="orden_cliente", uselist=False)
     orden_proveedor = db.relationship('User', backref="orden_proveedor", uselist=False) 
-    orden_detalle_servicio = db.relationship('DetalleServicio', backref="orden_detalle_servicio", uselist=False)
+    orden_detalle_servicio = db.relationship('TipoServicio', backref="orden_detalle_servicio", uselist=False)
 
 
     def __repr__(self):
@@ -313,8 +232,8 @@ class OrdenServicio(db.Model):
             "status_orden_aceptada":self.status_orden_aceptada,
             "status_orden_progreso":self.status_orden_progreso,
             "detalle_servicio_id":self.detalle_servicio_id,
-            "proveedor_id":self.proveedor_id,
-            "cliente_id":self.cliente_id,
+            "proveedor_id":self.orden_proveedor,
+            "cliente_id":self.orden_cliente,
         }
 
     def __init__(self, *args, **kwargs):
