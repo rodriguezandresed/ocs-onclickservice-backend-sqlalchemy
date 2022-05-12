@@ -12,15 +12,15 @@ class User(db.Model):
     nombre = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(250), nullable=False)
     password = db.Column(db.String(250), nullable=False)
-    login_status = db.Column(db.Boolean, nullable=False)
+    login_status = db.Column(db.Boolean)
     fecha_registro = db.Column(db.Date, nullable=False)
-    tipo_ususario = db.Column(db.String(250), nullable=False)
-    social = db.Column(db.String(250), nullable=False)
-    cliente_activo = db.Column(db.Boolean, nullable=False)
-    proveedor_activo = db.Column(db.Boolean, nullable=False)
-    imagen = db.Column(db.String(250), nullable=False)
-    detalle = db.Column(db.String(250), nullable=False)
-    fecha_activacion = db.Column(db.Date, nullable=False)
+    tipo_usuario = db.Column(db.String(250), nullable=False)
+    social = db.Column(db.String(250))
+    cliente_activo = db.Column(db.Boolean)
+    proveedor_activo = db.Column(db.Boolean)
+    imagen = db.Column(db.String(250))
+    detalle = db.Column(db.String(250))
+    fecha_activacion = db.Column(db.Date)
 
 
 
@@ -30,7 +30,16 @@ class User(db.Model):
     def serialize(self):
         return {
 			"id": self.id,
+            "nombre": self.nombre,
 			"email": self.email,
+            "fecha_registro":self.fecha_registro,
+            "tipo_usuario":self.tipo_usuario,
+            "cliente_activo":self.cliente_activo,
+            "proveedor_activo":self.proveedor_activo,           
+            "detalle":self.detalle,
+            "fecha_activacion":self.fecha_activacion,
+            "imagen":self.imagen,  
+            "social":self.social,              
 			#do not serialize the password, it's a security breach
 		}
 
@@ -63,13 +72,9 @@ class AdminUser(db.Model):
     nombre = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(250), nullable=False)
     password = db.Column(db.String(250), nullable=False)
-    login_status = db.Column(db.Boolean, nullable=False)
     fecha_registro = db.Column(db.Date, nullable=False)
-    tipo_ususario = db.Column(db.String(250), nullable=False)
-    social = db.Column(db.String(250), nullable=False)
-    imagen = db.Column(db.String(250), nullable=False)
-    detalle = db.Column(db.String(250), nullable=False)
-    evaluate_status = db.Column(db.Boolean, nullable=False)
+    tipo_ususario = db.Column(db.String(250))
+    detalle = db.Column(db.String(250))
     
     def __repr__(self):
         return f'<Admin> f{self.nombre}'
@@ -78,8 +83,8 @@ class AdminUser(db.Model):
         return {
 			"admin_name": self.nombre,
 			"admin_email":self.email,
-            "admin_social":self.social,
-            "admin_id":self.id
+            "admin_id":self.id,
+            "admin_detalle":self.detalle,
 			#do not serialize the password, it's a security breach
 		}
 
@@ -176,6 +181,7 @@ class EvaluacionProveedor(db.Model):
             "id":self.id,
             "comentario":self.comentario,
             "evaluate_status":self.evaluate_status,
+            "detalle_servicio_evaluado":self.detalle_servicio_evaluado,
             "proveedor_id":self.proveedor_evaluado,
             "cliente_id":self.cliente_evaluador,
             "resultado_evaluacion":self.resultado_evaluacion,
@@ -208,7 +214,7 @@ class OrdenServicio(db.Model):
     contador = db.Column(db.Integer, nullable=False)
     precio_orden = db.Column(db.Float, nullable=False)
     precio_total_orden = db.Column(db.Float, nullable=False)
-    status_orden_recibido = db.Column(db.Boolean, nullable=False)
+    status_orden_recibida = db.Column(db.Boolean, nullable=False)
     status_orden_cancelada = db.Column(db.Boolean, nullable=False)
     status_orden_aceptada = db.Column(db.Boolean, nullable=False)
     status_orden_progreso = db.Column(db.Boolean, nullable=False) 
@@ -228,12 +234,13 @@ class OrdenServicio(db.Model):
             "contador":self.contador,
             "precio_orden":self.precio_orden,
             "precio_total_orden":self.precio_total_orden,
-            "status_orden_recibido":self.status_orden_recibido,
+            "status_orden_recibido":self.status_orden_recibida,
             "status_orden_aceptada":self.status_orden_aceptada,
             "status_orden_progreso":self.status_orden_progreso,
             "detalle_servicio_id":self.detalle_servicio_id,
             "proveedor_id":self.orden_proveedor,
             "cliente_id":self.orden_cliente,
+            "orden_detalle_servicio":self.orden_detalle_servicio,
         }
 
     def __init__(self, *args, **kwargs):
