@@ -25,7 +25,7 @@ class User(db.Model):
 
 
     def __repr__(self):
-        return '<User %r>' % self.id
+        return '<User %r>' % self.nombre
 
     def serialize(self):
         return {
@@ -71,7 +71,7 @@ class AdminUser(db.Model):
     detalle = db.Column(db.String(250), nullable=False)
 
     def __repr__(self):
-        return f'<Admin> f{self.id}'
+        return f'<Admin> f{self.nombre}'
 
     def serialize(self):
         return {
@@ -91,7 +91,9 @@ class TipoServicio(db.Model):
     proveedor_id= db.Column(db.Integer, db.ForeignKey('user.id') )
     status_active = db.Column(db.Boolean, nullable=False)
     nombre = db.Column(db.String(250), nullable=False)
-    detalle = db.Column(db.String(250), nullable=False) 
+    detalle = db.Column(db.String(250), nullable=False)
+ #   nature_planet = db.relationship('Planet', backref="nature", uselist=True)
+    user_proveedor = db.relationship('User', backref="tipo_servicio", uselist=False)  
     __table_args__ = (db.UniqueConstraint(
 	"id","proveedor_id","detalle",
 	name="debe_tener_una_sola_coincidencia"
@@ -99,7 +101,7 @@ class TipoServicio(db.Model):
 
 
     def __repr__(self):
-        return f'<Tipo de Servicio> f{self.id}'
+        return f'<Tipo de Servicio> f{self.nombre}'
 
     def serialize(self):
         return{
@@ -155,10 +157,10 @@ class TipoSubServicio(db.Model):
     status_activo = db.Column(db.Boolean, nullable=False)
     detalle = db.Column(db.String(250), nullable=False)
     nombre = db.Column(db.String(250), nullable=False)
-
+    tipo_servicio = db.relationship('TipoServicio', backref="tipo_sub_servicio", uselist=False)  
 
     def __repr__(self):
-        return f'<Tipo de SubServicio> f{self.id}'
+        return f'<Tipo de SubServicio> f{self.nombre}'
 
     def serialize(self):
         return{
@@ -196,11 +198,12 @@ class DetalleServicio(db.Model):
     tipo_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_sub_servicio.id') )
     evaluate_status = db.Column(db.Boolean, nullable=False)
     detalle = db.Column(db.String(250), nullable=False)
-    nombre = db.Column(db.String(250), nullable=False)   
+    nombre = db.Column(db.String(250), nullable=False)
+    tipo_sub_servicio = db.relationship('TipoSubServicio', backref="tipo_sub_servicio", uselist=False)     
 
 
     def __repr__(self):
-        return f'<Detalles del Servicio> f{self.id}'
+        return f'<Detalles del Servicio> f{self.nombre}'
 
     def serialize(self):
         return{
@@ -239,9 +242,11 @@ class EvaluacionProveedor(db.Model):
     comentario = db.Column(db.String(250), nullable=False)
     evaluate_status = db.Column(db.Boolean, nullable=False)
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('detalle_servicio.id') )
-    proveedor_id= db.Column(db.Integer, db.ForeignKey('user.id') )
-    cliente_id= db.Column(db.Integer, db.ForeignKey('user.id') )
+    user_id= db.Column(db.Integer, db.ForeignKey('user.id') )
     resultado_evaluacion= db.Column(db.Float, nullable=False)
+    cliente_evaluador = db.relationship('User', backref="cliente_evaluador", uselist=False) 
+    proveedor_evaluado = db.relationship('User', backref="proveedor_evaluado", uselist=False)   
+    detalle_servicio = db.relationship('DetalleServicio', backref="detalle_servicio", uselist=False)
 
 
     def __repr__(self):
@@ -289,9 +294,10 @@ class OrdenServicio(db.Model):
     status_orden_aceptada = db.Column(db.Boolean, nullable=False)
     status_orden_progreso = db.Column(db.Boolean, nullable=False)
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('detalle_servicio.id') )
-    proveedor_id= db.Column(db.Integer, db.ForeignKey('user.id') ) 
-    cliente_id= db.Column(db.Integer, db.ForeignKey('user.id') ) 
-
+    user_id= db.Column(db.Integer, db.ForeignKey('user.id') ) 
+    orden_cliente = db.relationship('User', backref="orden_cliente", uselist=False)
+    orden_proveedor = db.relationship('User', backref="orden_proveedor", uselist=False) 
+    orden_detalle_servicio = db.relationship('DetalleServicio', backref="orden_detalle_servicio", uselist=False)
 
 
     def __repr__(self):
