@@ -104,7 +104,7 @@ def handle_other_user():
 			"msg": "something happened, try again"
 		}), 400
 		
-	user = User(email=body["email"], password=body["password"])
+	user = User(email=body["email"], password=body["password"], nombre=body["nombre"], fecha_registro=body["fecha_registro"], tipo_usuario=body["tipo_usuario"])
 	try:
 		db.session.add(user)
 		db.session.commit()

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: c9ba95e5f562
+Revision ID: e5856d2a9cf8
 Revises: 
-Create Date: 2022-05-12 19:18:40.377635
+Create Date: 2022-05-12 19:45:26.066704
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c9ba95e5f562'
+revision = 'e5856d2a9cf8'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,13 +23,9 @@ def upgrade():
     sa.Column('nombre', sa.String(length=250), nullable=False),
     sa.Column('email', sa.String(length=250), nullable=False),
     sa.Column('password', sa.String(length=250), nullable=False),
-    sa.Column('login_status', sa.Boolean(), nullable=False),
     sa.Column('fecha_registro', sa.Date(), nullable=False),
-    sa.Column('tipo_ususario', sa.String(length=250), nullable=False),
-    sa.Column('social', sa.String(length=250), nullable=False),
-    sa.Column('imagen', sa.String(length=250), nullable=False),
-    sa.Column('detalle', sa.String(length=250), nullable=False),
-    sa.Column('evaluate_status', sa.Boolean(), nullable=False),
+    sa.Column('tipo_ususario', sa.String(length=250), nullable=True),
+    sa.Column('detalle', sa.String(length=250), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user',
@@ -37,15 +33,15 @@ def upgrade():
     sa.Column('nombre', sa.String(length=250), nullable=False),
     sa.Column('email', sa.String(length=250), nullable=False),
     sa.Column('password', sa.String(length=250), nullable=False),
-    sa.Column('login_status', sa.Boolean(), nullable=False),
+    sa.Column('login_status', sa.Boolean(), nullable=True),
     sa.Column('fecha_registro', sa.Date(), nullable=False),
-    sa.Column('tipo_ususario', sa.String(length=250), nullable=False),
-    sa.Column('social', sa.String(length=250), nullable=False),
-    sa.Column('cliente_activo', sa.Boolean(), nullable=False),
-    sa.Column('proveedor_activo', sa.Boolean(), nullable=False),
-    sa.Column('imagen', sa.String(length=250), nullable=False),
-    sa.Column('detalle', sa.String(length=250), nullable=False),
-    sa.Column('fecha_activacion', sa.Date(), nullable=False),
+    sa.Column('tipo_usuario', sa.String(length=250), nullable=False),
+    sa.Column('social', sa.String(length=250), nullable=True),
+    sa.Column('cliente_activo', sa.Boolean(), nullable=True),
+    sa.Column('proveedor_activo', sa.Boolean(), nullable=True),
+    sa.Column('imagen', sa.String(length=250), nullable=True),
+    sa.Column('detalle', sa.String(length=250), nullable=True),
+    sa.Column('fecha_activacion', sa.Date(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('tipo_servicio',
@@ -75,7 +71,7 @@ def upgrade():
     sa.Column('contador', sa.Integer(), nullable=False),
     sa.Column('precio_orden', sa.Float(), nullable=False),
     sa.Column('precio_total_orden', sa.Float(), nullable=False),
-    sa.Column('status_orden_recibido', sa.Boolean(), nullable=False),
+    sa.Column('status_orden_recibida', sa.Boolean(), nullable=False),
     sa.Column('status_orden_cancelada', sa.Boolean(), nullable=False),
     sa.Column('status_orden_aceptada', sa.Boolean(), nullable=False),
     sa.Column('status_orden_progreso', sa.Boolean(), nullable=False),
