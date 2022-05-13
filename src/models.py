@@ -21,7 +21,8 @@ class User(db.Model):
     imagen = db.Column(db.String(250))
     detalle = db.Column(db.String(250))
     fecha_activacion = db.Column(db.Date)
-
+    direccion = db.Column(db.String(250))
+    telefono = db.Column(db.String(250))
 
 
     def __repr__(self):
@@ -39,28 +40,12 @@ class User(db.Model):
             "detalle":self.detalle,
             "fecha_activacion":self.fecha_activacion,
             "imagen":self.imagen,  
-            "social":self.social,              
+            "social":self.social,
+            "direccion":self.direccion,
+            "telefono":self.telefono,              
 			#do not serialize the password, it's a security breach
 		}
 
-
-# class Nature(db.Model):
-#     # Here we define db.Columns for the table address.
-#     # Notice that each db.db.Column is also a normal Python instance attribute.
-#     id = db.db.db.Column(db.db.db.Integer, primary_key=True)
-#     nature_name = db.db.db.Column(db.db.db.String(250))
-#     nature_person = db.db.relationship('Person', backref="nature", uselist=True)
-#     nature_planet = db.db.relationship('Planet', backref="nature", uselist=True)
-#     nature_favorite = db.db.relationship('Favorite', backref="nature", uselist=True)
-
-#     def __repr__(self):
-#         return f'<Nature > f{self.nature_name}'
-
-#     def serialize(self):
-#         return {
-# 			"natureName": self.natureName,
-# 			#do not serialize the password, it's a security breach
-# 		}
 
 
 
@@ -99,7 +84,6 @@ class TipoServicio(db.Model):
     nombre_tipo_servicio = db.Column(db.String(250), nullable=False)
     nombre_tipo_sub_servicio = db.Column(db.String(250), nullable=False)
     detalle_tipo_servicio = db.Column(db.String(250), nullable=False)
- #   nature_planet = db.relationship('Planet', backref="nature", uselist=True)
     user_proveedor = db.relationship('User', backref="tipo_servicio", uselist=False)  
     __table_args__ = (db.UniqueConstraint(
 	"id","proveedor_id","nombre_tipo_servicio","nombre_tipo_sub_servicio","detalle_tipo_servicio","status_active",
