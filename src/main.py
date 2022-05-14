@@ -142,6 +142,76 @@ def handle_login():
 			"msg": "something happened, try again"
 		}), 400	
 
+
+@app.route('/proveedores/<string:tipo_servicio>/<int:detalle_servicio', methods=['POST'])
+@jwt_required()
+def handle_add_favorite(nature, name_id):
+	body=request.json
+	body_name=body.get("favorite_name", None)
+# creo que no hace falta, [update] lo que no es *****
+#	body_nature=body.get("favorite_nature", None)
+
+	if body_name is not  None:
+		user = get_jwt_identity()
+		if user is not None:
+			if nature == "planets":
+				wildcard=1
+				name = Planets.query.filter_by(name = body_name).first()
+				if name is not None:
+					favorite= Favorite.query.filter_by(favorite_name=body_name, user_id=user).first()
+					if favorite is not None:
+							return jsonify({
+								"msg":"Favorited item already exists!"
+							})
+					else:
+						favorite = Favorite(favorite_name=body["favorite_name"], favorite_nature=wildcard,favorite_id=name_id, user_id=user )	
+						try:
+							db.session.add(favorite)
+							db.session.commit()
+							return jsonify(favorite.serialize()), 201
+						except Exception as error:
+							db.session.rollback()
+							return jsonify(error.args), 500
+				else: 
+					return jsonify({
+									"msg": "Planet does not exist!"
+									}), 400
+			elif nature == "people":
+				wildcard=2
+				name = People.query.filter_by(name = body_name).first()
+				if name is not None:
+					## para sqlflask el comparativo AND es una , 
+					favorite= Favorite.query.filter_by( favorite_name=body_name, user_id=user ).first()
+					if favorite is not None:
+							return jsonify({
+								"msg":"Favorited item already exists!"
+							})
+					else:
+						favorite = Favorite(favorite_name=body["favorite_name"], favorite_nature=wildcard,favorite_id=name_id,  user_id=user )	
+						try:
+							db.session.add(favorite)
+							db.session.commit()
+							return jsonify(favorite.serialize()), 201
+						except Exception as error:
+							db.session.rollback()
+							return jsonify(error.args), 500
+				else: 
+					return jsonify({
+									"msg": "Person does not exist!"
+									}), 400
+			else:
+				return jsonify({
+								"msg": "Not a Planet or a Person!"
+								}), 400
+		else:
+				return jsonify({
+								"msg": "Please log in!"
+								}), 400
+	else:
+		return jsonify({
+						"msg": "something happened, try again [bad body format]"
+						}), 400
+
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
