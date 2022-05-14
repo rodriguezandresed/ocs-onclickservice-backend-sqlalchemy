@@ -73,7 +73,11 @@ class TipoServicio(db.Model):
     nombre_tipo_servicio = db.Column(db.Enum(TiposServicio), nullable=False)
     nombre_tipo_sub_servicio = db.Column(db.String(250), nullable=False)
     detalle_tipo_servicio = db.Column(db.String(250), nullable=False)
-    user_proveedor = db.relationship('User', backref="tipo_servicio", uselist=False)  
+    #Defining Foreign Keys
+    proveedor_id= db.Column(db.Integer, db.ForeignKey('user.id') )
+    #Defining Relationships
+    proveedor = db.relationship("User", foreign_keys=[proveedor_id])
+
     __table_args__ = (db.UniqueConstraint(
 	"id","proveedor_id","nombre_tipo_servicio","nombre_tipo_sub_servicio","detalle_tipo_servicio","status_active",
 	name="debe_tener_una_sola_coincidencia"
@@ -138,18 +142,16 @@ class EvaluacionProveedor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     comentario = db.Column(db.String(250), nullable=False)
     evaluate_status = db.Column(db.Boolean, nullable=False)
-    detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
-    user_id= db.Column(db.Integer, db.ForeignKey('user.id') )
     resultado_evaluacion= db.Column(db.Float, nullable=False)
-
+    #Defining Foreign Keys
+    detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
     cliente_evaluador_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     proveedor_evaluado_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-
+    #Defining Relationships
     cliente_evaluador = db.relationship("User", foreign_keys=[cliente_evaluador_id])
     proveedor_evaluado = db.relationship("User", foreign_keys=[proveedor_evaluado_id])
+    detalle_servicio = db.relationship("TipoServicio", foreign_keys=[detalle_servicio_id])
 
-
-    detalle_servicio_evaluado = db.relationship('TipoServicio', backref="detalle_servicio_evaluado", uselist=False)
 
 
     def __repr__(self):
@@ -197,17 +199,14 @@ class OrdenServicio(db.Model):
     status_orden_cancelada = db.Column(db.Boolean, nullable=False)
     status_orden_aceptada = db.Column(db.Boolean, nullable=False)
     status_orden_progreso = db.Column(db.Boolean, nullable=False) 
+    #Defining Foreign Keys
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
-    
     cliente_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     proveedor_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-
+    #Defining Relationships
     cliente = db.relationship("User", foreign_keys=[cliente_id])
     proveedor = db.relationship("User", foreign_keys=[proveedor_id])
-
-
-    orden_detalle_servicio = db.relationship('TipoServicio', backref="orden_detalle_servicio", uselist=False)
-
+    detalle_servicio = db.relationship("TipoServicio", foreign_keys=[detalle_servicio_id])
 
     def __repr__(self):
         return f'<Orden de Servicio> f{self.id}'
