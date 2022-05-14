@@ -141,9 +141,15 @@ class EvaluacionProveedor(db.Model):
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
     user_id= db.Column(db.Integer, db.ForeignKey('user.id') )
     resultado_evaluacion= db.Column(db.Float, nullable=False)
-    cliente_evaluador = db.relationship('User', backref="cliente_evaluador", uselist=True) 
-    proveedor_evaluado = db.relationship('User', backref="proveedor_evaluado", uselist=True)   
-    detalle_servicio_evaluado = db.relationship('TipoServicio', backref="detalle_servicio_evaluado", uselist=True)
+
+    cliente_evaluador_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    proveedor_evaluado_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+
+    cliente_evaluador = db.relationship("User", foreign_keys=[cliente_evaluador_id])
+    proveedor_evaluado = db.relationship("User", foreign_keys=[proveedor_evaluado_id])
+
+
+    detalle_servicio_evaluado = db.relationship('TipoServicio', backref="detalle_servicio_evaluado", uselist=False)
 
 
     def __repr__(self):
@@ -155,8 +161,8 @@ class EvaluacionProveedor(db.Model):
             "comentario":self.comentario,
             "evaluate_status":self.evaluate_status,
             "detalle_servicio_evaluado":self.detalle_servicio_evaluado,
-            "proveedor_id":self.proveedor_evaluado,
-            "cliente_id":self.cliente_evaluador,
+            "proveedor_id":self.user_proveedor,
+            "cliente_id":self.user_cliente,
             "resultado_evaluacion":self.resultado_evaluacion,
         }
 
@@ -192,10 +198,15 @@ class OrdenServicio(db.Model):
     status_orden_aceptada = db.Column(db.Boolean, nullable=False)
     status_orden_progreso = db.Column(db.Boolean, nullable=False) 
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
-    user_id= db.Column(db.Integer, db.ForeignKey('user.id') ) 
-    orden_cliente = db.relationship('User', backref="orden_cliente", uselist=True)
-    orden_proveedor = db.relationship('User', backref="orden_proveedor", uselist=True) 
-    orden_detalle_servicio = db.relationship('TipoServicio', backref="orden_detalle_servicio", uselist=True)
+    
+    cliente_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    proveedor_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+
+    cliente = db.relationship("User", foreign_keys=[cliente_id])
+    proveedor = db.relationship("User", foreign_keys=[proveedor_id])
+
+
+    orden_detalle_servicio = db.relationship('TipoServicio', backref="orden_detalle_servicio", uselist=False)
 
 
     def __repr__(self):
@@ -211,8 +222,8 @@ class OrdenServicio(db.Model):
             "status_orden_aceptada":self.status_orden_aceptada,
             "status_orden_progreso":self.status_orden_progreso,
             "detalle_servicio_id":self.detalle_servicio_id,
-            "proveedor_id":self.orden_proveedor,
-            "cliente_id":self.orden_cliente,
+            "proveedor_id":self.user_proveedor,
+            "cliente_id":self.user_cliente,
             "orden_detalle_servicio":self.orden_detalle_servicio,
         }
 
