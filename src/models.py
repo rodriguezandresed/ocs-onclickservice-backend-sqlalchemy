@@ -1,7 +1,23 @@
 from flask_sqlalchemy import SQLAlchemy
+import enum
 
 db = SQLAlchemy()
 
+class TipoUser(enum.Enum):
+    GENERAL = "General"
+    ADMIN = "Admin"
+    PROVEEDOR = "Proveedor"
+
+class TiposServicio(enum.Enum):
+    GENERAL = "General"
+    PLOMERIA = "Plomeria"
+    CARPINTERIA = "Carpinteria"
+    COMPUTACION = "Computacion"
+    ALBANILERIA = "Albanileria"
+    COCINA = "Cocina"
+    LIMPIEZA = "Limpieza"
+    ACONDICIONADO ="Aire Acondicionado"
+    FUMIGACION = "Fumigacion"
 
 
 class User(db.Model):
@@ -14,7 +30,7 @@ class User(db.Model):
     password = db.Column(db.String(250), nullable=False)
     login_status = db.Column(db.Boolean)
     fecha_registro = db.Column(db.Date, nullable=False)
-    tipo_usuario = db.Column(db.String(250), nullable=False)
+    tipo_usuario = db.Column(db.Enum(TipoUser), nullable=False)
     social = db.Column(db.String(250))
     cliente_activo = db.Column(db.Boolean)
     proveedor_activo = db.Column(db.Boolean)
@@ -47,33 +63,6 @@ class User(db.Model):
 		}
 
 
-
-
-class AdminUser(db.Model):
-    __tablename__ = 'admin_user'
-    # Here we define columns for the table person
-    # Notice that each db.Column is also a normal Python instance attribute.
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(250), nullable=False)
-    email = db.Column(db.String(250), nullable=False)
-    password = db.Column(db.String(250), nullable=False)
-    fecha_registro = db.Column(db.Date, nullable=False)
-    tipo_ususario = db.Column(db.String(250))
-    detalle = db.Column(db.String(250))
-    
-    def __repr__(self):
-        return f'<Admin> f{self.nombre}'
-
-    def serialize(self):
-        return {
-			"admin_name": self.nombre,
-			"admin_email":self.email,
-            "admin_id":self.id,
-            "admin_detalle":self.detalle,
-			#do not serialize the password, it's a security breach
-		}
-
-
 class TipoServicio(db.Model):
     __tablename__ = 'tipo_servicio'
     # Here we define columns for the table person
@@ -81,7 +70,7 @@ class TipoServicio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     proveedor_id= db.Column(db.Integer, db.ForeignKey('user.id') )
     status_active = db.Column(db.Boolean, nullable=False)
-    nombre_tipo_servicio = db.Column(db.String(250), nullable=False)
+    nombre_tipo_servicio = db.Column(db.Enum(TiposServicio), nullable=False)
     nombre_tipo_sub_servicio = db.Column(db.String(250), nullable=False)
     detalle_tipo_servicio = db.Column(db.String(250), nullable=False)
     user_proveedor = db.relationship('User', backref="tipo_servicio", uselist=False)  
@@ -152,9 +141,9 @@ class EvaluacionProveedor(db.Model):
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
     user_id= db.Column(db.Integer, db.ForeignKey('user.id') )
     resultado_evaluacion= db.Column(db.Float, nullable=False)
-    cliente_evaluador = db.relationship('User', backref="cliente_evaluador", uselist=False) 
-    proveedor_evaluado = db.relationship('User', backref="proveedor_evaluado", uselist=False)   
-    detalle_servicio_evaluado = db.relationship('TipoServicio', backref="detalle_servicio_evaluado", uselist=False)
+    cliente_evaluador = db.relationship('User', backref="cliente_evaluador", uselist=True) 
+    proveedor_evaluado = db.relationship('User', backref="proveedor_evaluado", uselist=True)   
+    detalle_servicio_evaluado = db.relationship('TipoServicio', backref="detalle_servicio_evaluado", uselist=True)
 
 
     def __repr__(self):
@@ -204,9 +193,9 @@ class OrdenServicio(db.Model):
     status_orden_progreso = db.Column(db.Boolean, nullable=False) 
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
     user_id= db.Column(db.Integer, db.ForeignKey('user.id') ) 
-    orden_cliente = db.relationship('User', backref="orden_cliente", uselist=False)
-    orden_proveedor = db.relationship('User', backref="orden_proveedor", uselist=False) 
-    orden_detalle_servicio = db.relationship('TipoServicio', backref="orden_detalle_servicio", uselist=False)
+    orden_cliente = db.relationship('User', backref="orden_cliente", uselist=True)
+    orden_proveedor = db.relationship('User', backref="orden_proveedor", uselist=True) 
+    orden_detalle_servicio = db.relationship('TipoServicio', backref="orden_detalle_servicio", uselist=True)
 
 
     def __repr__(self):
