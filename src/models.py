@@ -3,21 +3,21 @@ import enum
 
 db = SQLAlchemy()
 
-class TipoUser(enum.Enum):
-    GENERAL = "General"
-    ADMIN = "Admin"
-    PROVEEDOR = "Proveedor"
+class TipoUser(str, enum.Enum):
+    General = "General"
+    Admin = "Admin"
+    Proveedor = "Proveedor"
 
-class TiposServicio(enum.Enum):
-    GENERAL = "General"
-    PLOMERIA = "Plomeria"
-    CARPINTERIA = "Carpinteria"
-    COMPUTACION = "Computacion"
-    ALBANILERIA = "Albanileria"
-    COCINA = "Cocina"
-    LIMPIEZA = "Limpieza"
-    ACONDICIONADO ="Aire Acondicionado"
-    FUMIGACION = "Fumigacion"
+class TiposServicio(str, enum.Enum):
+    General = "General"
+    Plomeria = "Plomeria"
+    Carpinteria = "Carpinteria"
+    Computacion = "Computacion"
+    Albanileria = "Albanileria"
+    Cocina = "Cocina"
+    Limpieza = "Limpieza"
+    Acondicionado ="Aire Acondicionado"
+    Fumigacion = "Fumigacion"
 
 
 class User(db.Model):
@@ -69,7 +69,7 @@ class TipoServicio(db.Model):
     # Notice that each db.Column is also a normal Python instance attribute.
     id = db.Column(db.Integer, primary_key=True)
     proveedor_id= db.Column(db.Integer, db.ForeignKey('user.id') )
-    status_active = db.Column(db.Boolean, nullable=False)
+    status_active = db.Column(db.Boolean)
     nombre_tipo_servicio = db.Column(db.Enum(TiposServicio), nullable=False)
     nombre_tipo_sub_servicio = db.Column(db.String(250), nullable=False)
     detalle_tipo_servicio = db.Column(db.String(250), nullable=False)

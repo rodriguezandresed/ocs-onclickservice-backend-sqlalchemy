@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: e76f7ddbd025
+Revision ID: 64ee57fd56f0
 Revises: 
-Create Date: 2022-05-14 14:51:58.644933
+Create Date: 2022-05-16 19:27:04.786614
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e76f7ddbd025'
+revision = '64ee57fd56f0'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,7 +25,7 @@ def upgrade():
     sa.Column('password', sa.String(length=250), nullable=False),
     sa.Column('login_status', sa.Boolean(), nullable=True),
     sa.Column('fecha_registro', sa.Date(), nullable=False),
-    sa.Column('tipo_usuario', sa.Enum('GENERAL', 'ADMIN', 'PROVEEDOR', name='tipouser'), nullable=False),
+    sa.Column('tipo_usuario', sa.Enum('General', 'Admin', 'Proveedor', name='tipouser'), nullable=False),
     sa.Column('social', sa.String(length=250), nullable=True),
     sa.Column('cliente_activo', sa.Boolean(), nullable=True),
     sa.Column('proveedor_activo', sa.Boolean(), nullable=True),
@@ -38,11 +38,11 @@ def upgrade():
     )
     op.create_table('tipo_servicio',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('proveedor_id', sa.Integer(), nullable=True),
-    sa.Column('status_active', sa.Boolean(), nullable=False),
-    sa.Column('nombre_tipo_servicio', sa.Enum('GENERAL', 'PLOMERIA', 'CARPINTERIA', 'COMPUTACION', 'ALBANILERIA', 'COCINA', 'LIMPIEZA', 'ACONDICIONADO', 'FUMIGACION', name='tiposservicio'), nullable=False),
+    sa.Column('status_active', sa.Boolean(), nullable=True),
+    sa.Column('nombre_tipo_servicio', sa.Enum('General', 'Plomeria', 'Carpinteria', 'Computacion', 'Albanileria', 'Cocina', 'Limpieza', 'Acondicionado', 'Fumigacion', name='tiposservicio'), nullable=False),
     sa.Column('nombre_tipo_sub_servicio', sa.String(length=250), nullable=False),
     sa.Column('detalle_tipo_servicio', sa.String(length=250), nullable=False),
+    sa.Column('proveedor_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['proveedor_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('id', 'proveedor_id', 'nombre_tipo_servicio', 'nombre_tipo_sub_servicio', 'detalle_tipo_servicio', 'status_active', name='debe_tener_una_sola_coincidencia')

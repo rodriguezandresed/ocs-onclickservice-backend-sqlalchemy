@@ -143,78 +143,130 @@ def handle_login():
 		}), 400	
 
 
+@app.route('/agregar', methods=['POST'])
 # @app.route('/proveedores/<string:nature>/<int:name_id>', methods=['POST'])
-# # @app.route('/proveedores/<string:nature>/<int:name_id>', methods=['POST'])
-# @jwt_required()
+@jwt_required()
+def handle_add_servicio():
 # def handle_add_favorite(nature, name_id):
-# # def handle_add_favorite(nature, name_id):
-# 	body=request.json
-# 	body_name=body.get("favorite_name", None)
-# # creo que no hace falta, [update] lo que no es *****
-# #	body_nature=body.get("favorite_nature", None)
+	body=request.json
+	body_name=body.get("nombre_tipo_sub_servicio", None)
+# creo que no hace falta, [update] lo que no es *****
+#	body_nature=body.get("favorite_nature", None)
 
-# 	if body_name is not  None:
-# 		user = get_jwt_identity()
-# 		if user is not None:
-# 			if nature == "planets":
-# 				wildcard=1
-# 				name = Planets.query.filter_by(name = body_name).first()
-# 				if name is not None:
-# 					favorite= Favorite.query.filter_by(favorite_name=body_name, user_id=user).first()
-# 					if favorite is not None:
-# 							return jsonify({
-# 								"msg":"Favorited item already exists!"
-# 							})
-# 					else:
-# 						favorite = Favorite(favorite_name=body["favorite_name"], favorite_nature=wildcard,favorite_id=name_id, user_id=user )	
-# 						try:
-# 							db.session.add(favorite)
-# 							db.session.commit()
-# 							return jsonify(favorite.serialize()), 201
-# 						except Exception as error:
-# 							db.session.rollback()
-# 							return jsonify(error.args), 500
-# 				else: 
-# 					return jsonify({
-# 									"msg": "Planet does not exist!"
-# 									}), 400
-# 			elif nature == "people":
-# 				wildcard=2
-# 				name = People.query.filter_by(name = body_name).first()
-# 				if name is not None:
-# 					## para sqlflask el comparativo AND es una , 
-# 					favorite= Favorite.query.filter_by( favorite_name=body_name, user_id=user ).first()
-# 					if favorite is not None:
-# 							return jsonify({
-# 								"msg":"Favorited item already exists!"
-# 							})
-# 					else:
-# 						favorite = Favorite(favorite_name=body["favorite_name"], favorite_nature=wildcard,favorite_id=name_id,  user_id=user )	
-# 						try:
-# 							db.session.add(favorite)
-# 							db.session.commit()
-# 							return jsonify(favorite.serialize()), 201
-# 						except Exception as error:
-# 							db.session.rollback()
-# 							return jsonify(error.args), 500
-# 				else: 
-# 					return jsonify({
-# 									"msg": "Person does not exist!"
-# 									}), 400
-# 			else:
-# 				return jsonify({
-# 								"msg": "Not a Planet or a Person!"
-# 								}), 400
-# 		else:
-# 				return jsonify({
-# 								"msg": "Please log in!"
-# 								}), 400
-# 	else:
-# 		return jsonify({
-# 						"msg": "something happened, try again [bad body format]"
-# 						}), 400
+	if body_name is not  None:
+		user = get_jwt_identity()
+		user_status = User.query.filter_by(id=user).one_or_none()
+		print (user_status)
+		print(body_name)
+		if user is not None:
+					tipo_servicio= TipoServicio.query.filter_by(nombre_tipo_sub_servicio=body_name, proveedor_id=user).first()
+					print(tipo_servicio)
+					if tipo_servicio is not None:
+							return jsonify({
+								"msg":"El servicio ya existe en tu perfil!"
+							})
+					else:
+						servicio = TipoServicio(nombre_tipo_servicio=body["nombre_tipo_servicio"], nombre_tipo_sub_servicio=body["nombre_tipo_sub_servicio"],detalle_tipo_servicio=body["detalle_tipo_servicio"], proveedor_id=user )	
+						try:
+							db.session.add(servicio)
+							db.session.commit()
+							return jsonify(servicio.serialize()), 201
+						except Exception as error:
+							db.session.rollback()
+							return jsonify(error.args), 500
+		else:
+				return jsonify({
+								"msg": "Por favor entra en tu usuario!"
+								}), 400
+	else:
+		return jsonify({
+						"msg": "Algo paso, intentalo nuevamente [bad body format]"
+						}), 400
+
+@app.route('/proveedores/', methods=['GET'])
+@app.route('/proveedores/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
+def handle_proveedores(user_id = None):
+	if request.method == 'GET':
+		if user_id  is None:
+			users = TipoServicio.query.all()
+			users = list(map(lambda user: user.serialize(), users))
+			return jsonify(users),200
+		else:
+			user = User.query.filter_by(id=user_id).first()
+			if user is not None:
+				return jsonify(user.serialize()),200
+			else:
+				return jsonify({
+					"msg": "user not found"
+				}), 404
+
+
+
+@app.route('/editar_servicio/', methods=['PUT', 'DELETE'])
+@jwt_required()
+def handle_edit_servicio(user_id = None):
+	user = get_jwt_identity()
+	body = request.json
+	body_name=body.get("nombre_tipo_sub_servicio", None)
+
+	if request.method == 'PUT':
+		if not body.get("nombre_tipo_sub_servicio"):
+			return jsonify({
+				"msg": "something happened, try again"
+			}), 400
+
+		if not body.get("nombre_tipo_servicio"):
+			return jsonify({
+				"msg": "something happened, try again"
+			}), 400
+
+		if not body.get("detalle_tipo_servicio"):
+			return jsonify({
+				"msg": "something happened, try again"
+			}), 400
+
+
+		service_update = TipoServicio.query.filter_by(nombre_tipo_sub_servicio=body_name, proveedor_id=user).first()
+
+		if service_update is None:
+			return jsonify({
+				"msg": "User not found"
+			}), 404
+
+		servicio = TipoServicio(nombre_tipo_servicio=body["nombre_tipo_servicio"], nombre_tipo_sub_servicio=body["nombre_tipo_sub_servicio"],detalle_tipo_servicio=body["detalle_tipo_servicio"], proveedor_id=user )
+		
+		try:
+
+			service_update.nombre_tipo_servicio = body.get("nombre_tipo_servicio")
+			service_update.nombre_tipo_sub_servicio = body.get("nombre_tipo_sub_servicio")
+			service_update.detalle_tipo_servicio = body.get("detalle_tipo_servicio")
+			db.session.commit()
+			return jsonify(user.serialize()), 201
+		except Exception as error:
+			db.session.rollback()
+			return jsonify(error.args)
+
+
+	if request.method == 'DELETE':		
+		service_delete = TipoServicio.query.filter_by(nombre_tipo_sub_servicio=body_name, proveedor_id=user).first()
+		if service_delete is None:
+			return jsonify({
+				"msg": "User not found"
+			}), 404
+			
+		db.session.delete(service_delete)
+		
+		try: 
+			db.session.commit()
+			return jsonify([]), 204
+		except Exception as error:
+			db.session.rollback()
+			return jsonify(error.args)
+
 
 # this only runs if `$ python src/main.py` is executed
+
+
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=PORT, debug=False)
