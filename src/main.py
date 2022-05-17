@@ -188,13 +188,15 @@ def handle_add_servicio():
 def handle_proveedores(user_id = None):
 	if request.method == 'GET':
 		if user_id  is None:
-			users = TipoServicio.query.all()
-			users = list(map(lambda user: user.serialize(), users))
-			return jsonify(users),200
+			servicios = TipoServicio.query.all()
+			servicios = list(map(lambda servicio: servicio.serialize(), servicios))
+			return jsonify(servicios),200
 		else:
-			user = User.query.filter_by(id=user_id).first()
-			if user is not None:
-				return jsonify(user.serialize()),200
+			servicios = TipoServicio.query.filter_by(proveedor_id=user_id).all()
+			servicios = list(map(lambda servicio: servicio.serialize(), servicios))
+			print(servicios)
+			if servicios is not None:
+				return jsonify(servicios),200
 			else:
 				return jsonify({
 					"msg": "user not found"
@@ -230,7 +232,7 @@ def handle_edit_servicio(user_id = None):
 
 		if service_update is None:
 			return jsonify({
-				"msg": "User not found"
+				"msg": "No se encuentra el servicio"
 			}), 404
 
 		servicio = TipoServicio(nombre_tipo_servicio=body["nombre_tipo_servicio"], nombre_tipo_sub_servicio=body["nombre_tipo_sub_servicio"],detalle_tipo_servicio=body["detalle_tipo_servicio"], proveedor_id=user )
@@ -251,7 +253,7 @@ def handle_edit_servicio(user_id = None):
 		service_delete = TipoServicio.query.filter_by(nombre_tipo_sub_servicio=body_name, proveedor_id=user).first()
 		if service_delete is None:
 			return jsonify({
-				"msg": "User not found"
+				"msg": "No se encuentra el servicio"
 			}), 404
 			
 		db.session.delete(service_delete)
