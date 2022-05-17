@@ -184,7 +184,7 @@ def handle_add_servicio():
 						}), 400
 
 @app.route('/proveedores/', methods=['GET'])
-@app.route('/proveedores/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/proveedores/<int:user_id>', methods=['GET'])
 def handle_proveedores(user_id = None):
 	if request.method == 'GET':
 		if user_id  is None:
