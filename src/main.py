@@ -156,7 +156,6 @@ def handle_add_servicio():
 	if body_name is not  None:
 		user = get_jwt_identity()
 		user_status = User.query.filter_by(id=user).one_or_none()
-		print(user)
 
 		if user is not None:
 					tipo_servicio= TipoServicio.query.filter_by(nombre_tipo_sub_servicio=body_name, proveedor_id=user).first()
@@ -184,17 +183,17 @@ def handle_add_servicio():
 						}), 400
 
 @app.route('/proveedores/', methods=['GET'])
-@app.route('/proveedores/<int:user_id>', methods=['GET'])
-#@app.route('/proveedores/<string:tipo_servicio>', methods=['GET'])
-def handle_proveedores(user_id = None):
+#@app.route('/proveedores/<int:user_id>', methods=['GET'])
+@app.route('/proveedores/<string:tipo_servicio>', methods=['GET'])
+def handle_proveedores(tipo_servicio = None):
 	if request.method == 'GET':
-		if user_id  is None:
+		if tipo_servicio  is None:
 			servicios = TipoServicio.query.all()
 			servicios = list(map(lambda servicio: servicio.serialize(), servicios))
 			return jsonify(servicios),200
 		else:
-			servicios = TipoServicio.query.filter_by(proveedor_id=user_id).all()
-			#servicios = TipoServicio.query.filter_by(nombre_tipo_servicio=tipo_servicio).all()
+			#servicios = TipoServicio.query.filter_by(proveedor_id=user_id).all()
+			servicios = TipoServicio.query.filter_by(nombre_tipo_servicio=tipo_servicio).all()
 			servicios = list(map(lambda servicio: servicio.serialize(), servicios))
 			print(servicios)
 			if servicios is not None:
