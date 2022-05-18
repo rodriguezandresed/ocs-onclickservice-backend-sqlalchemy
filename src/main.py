@@ -279,22 +279,20 @@ def handle_add_orden():
 
 	if body_service is not  None:
 		user = get_jwt_identity()
-		cliente = User.query.filter_by(id=user).one_or_none()
-		proveedor = User.query.filter_by(nombre=body_proveedor).one_or_none()
-		servicio = TipoServicio.query.filter_by(nombre_tipo_sub_servicio=body_service).one_or_none()
-		print (cliente)
-		print(body_service)
-		print(proveedor)
-		print(servicio)
+		cliente_asignado = User.query.filter_by(id=user).first()
+		proveedor_asignado = User.query.filter_by(nombre=body_proveedor).first()
+		servicio = TipoServicio.query.filter_by(nombre_tipo_sub_servicio=body_service,  proveedor_id=proveedor_asignado.id ).first()
+
 		if user is not None:
-					orden_servicio= OrdenServicio.query.filter_by(detalle_servicio_id=body_service, cliente_id=user,proveedor_id=proveedor.id ).first()
+					orden_servicio= OrdenServicio.query.filter_by(detalle_servicio_id=servicio.id, cliente_id=cliente_asignado.id, proveedor_id=proveedor_asignado.id).first()
 					print(orden_servicio)
 					if orden_servicio is not None:
 							return jsonify({
 								"msg":"La orden por este servicio ya existe en tu perfil!"
 							})
 					else:
-						orden = OrdenServicio(detalle_servicio_id=servicio.id, proveedor_id=proveedor.id, cliente_id=user )	
+						orden = OrdenServicio(detalle_servicio_id=servicio.id, proveedor_id=proveedor_asignado.id, cliente_id=cliente_asignado.id)	
+						print(orden)
 						try:
 							db.session.add(orden)
 							db.session.commit()

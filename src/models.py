@@ -95,6 +95,8 @@ class TipoServicio(db.Model):
             "nombre":self.nombre_tipo_servicio,
             "sub_servicio":self.nombre_tipo_sub_servicio,
             "detalle":self.detalle_tipo_servicio,
+            "proveedor":self.proveedor,
+            "nombre_tipo_servicio":self.nombre_tipo_servicio,
         }
 
     def __init__(self, *args, **kwargs):
@@ -192,13 +194,13 @@ class OrdenServicio(db.Model):
     # Here we define columns for the table person
     # Notice that each db.Column is also a normal Python instance attribute.
     id = db.Column(db.Integer, primary_key=True)
-    contador = db.Column(db.Integer, nullable=False)
-    precio_orden = db.Column(db.Float, nullable=False)
-    precio_total_orden = db.Column(db.Float, nullable=False)
-    status_orden_recibida = db.Column(db.Boolean, nullable=False)
-    status_orden_cancelada = db.Column(db.Boolean, nullable=False)
-    status_orden_aceptada = db.Column(db.Boolean, nullable=False)
-    status_orden_progreso = db.Column(db.Boolean, nullable=False) 
+    contador = db.Column(db.Integer)
+    precio_orden = db.Column(db.Float)
+    precio_total_orden = db.Column(db.Float)
+    status_orden_recibida = db.Column(db.Boolean)
+    status_orden_cancelada = db.Column(db.Boolean)
+    status_orden_aceptada = db.Column(db.Boolean)
+    status_orden_progreso = db.Column(db.Boolean) 
     #Defining Foreign Keys
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
     cliente_id = db.Column(db.Integer, db.ForeignKey("user.id"))
@@ -221,9 +223,9 @@ class OrdenServicio(db.Model):
             "status_orden_aceptada":self.status_orden_aceptada,
             "status_orden_progreso":self.status_orden_progreso,
             "detalle_servicio_id":self.detalle_servicio_id,
-            "proveedor_id":self.user_proveedor,
-            "cliente_id":self.user_cliente,
-            "orden_detalle_servicio":self.orden_detalle_servicio,
+            "proveedor_id":self.proveedor_id,
+            "cliente_id":self.cliente_id,
+            "orden_detalle_servicio":self.detalle_servicio,
         }
 
     def __init__(self, *args, **kwargs):

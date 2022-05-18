@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 64ee57fd56f0
+Revision ID: 0ac264234bc6
 Revises: 
-Create Date: 2022-05-16 19:27:04.786614
+Create Date: 2022-05-17 18:59:33.010496
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '64ee57fd56f0'
+revision = '0ac264234bc6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -62,13 +62,13 @@ def upgrade():
     )
     op.create_table('orden_servicio',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('contador', sa.Integer(), nullable=False),
-    sa.Column('precio_orden', sa.Float(), nullable=False),
-    sa.Column('precio_total_orden', sa.Float(), nullable=False),
-    sa.Column('status_orden_recibida', sa.Boolean(), nullable=False),
-    sa.Column('status_orden_cancelada', sa.Boolean(), nullable=False),
-    sa.Column('status_orden_aceptada', sa.Boolean(), nullable=False),
-    sa.Column('status_orden_progreso', sa.Boolean(), nullable=False),
+    sa.Column('contador', sa.Integer(), nullable=True),
+    sa.Column('precio_orden', sa.Float(), nullable=True),
+    sa.Column('precio_total_orden', sa.Float(), nullable=True),
+    sa.Column('status_orden_recibida', sa.Boolean(), nullable=True),
+    sa.Column('status_orden_cancelada', sa.Boolean(), nullable=True),
+    sa.Column('status_orden_aceptada', sa.Boolean(), nullable=True),
+    sa.Column('status_orden_progreso', sa.Boolean(), nullable=True),
     sa.Column('detalle_servicio_id', sa.Integer(), nullable=True),
     sa.Column('cliente_id', sa.Integer(), nullable=True),
     sa.Column('proveedor_id', sa.Integer(), nullable=True),
