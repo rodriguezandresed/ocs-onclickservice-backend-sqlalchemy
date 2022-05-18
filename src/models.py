@@ -16,7 +16,7 @@ class TiposServicio(str, enum.Enum):
     Albanileria = "Albanileria"
     Cocina = "Cocina"
     Limpieza = "Limpieza"
-    Acondicionado ="Aire Acondicionado"
+    Acondicionado = "Aire Acondicionado"
     Fumigacion = "Fumigacion"
 
 
@@ -85,7 +85,7 @@ class TipoServicio(db.Model):
 
 
     def __repr__(self):
-        return f'<Tipo de Servicio> f{self.nombre_tipo_servicio}'
+        return f'<Tipo de Servicio> {self.nombre_tipo_servicio}'
 
     def serialize(self):
         return{
@@ -95,7 +95,7 @@ class TipoServicio(db.Model):
             "nombre":self.nombre_tipo_servicio,
             "sub_servicio":self.nombre_tipo_sub_servicio,
             "detalle":self.detalle_tipo_servicio,
-            "proveedor":self.proveedor,
+            "proveedor":self.proveedor.serialize(),
             "nombre_tipo_servicio":self.nombre_tipo_servicio,
         }
 
@@ -225,7 +225,7 @@ class OrdenServicio(db.Model):
             "detalle_servicio_id":self.detalle_servicio_id,
             "proveedor_id":self.proveedor_id,
             "cliente_id":self.cliente_id,
-            "orden_detalle_servicio":self.detalle_servicio,
+            "orden_detalle_servicio":self.detalle_servicio.serialize(),
         }
 
     def __init__(self, *args, **kwargs):
