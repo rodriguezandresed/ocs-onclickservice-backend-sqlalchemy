@@ -9,7 +9,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, TipoServicio, EvaluacionProveedor, OrdenServicio 
+from models import db, User, TipoServicio, EvaluacionProveedor, OrdenServicio, TiposServicio 
 #from models import Person
 
 app = Flask(__name__)
@@ -392,6 +392,19 @@ def handle_add_orden():
 # 		except Exception as error:
 # 			db.session.rollback()
 # 			return jsonify(error.args)
+@app.route('/servicios/', methods=['GET'])
+
+def handle_tipo_servicios():
+	if request.method == 'GET':
+			servicios = list(TiposServicio)
+			if servicios is not None:
+				return jsonify(servicios),200
+			else:
+				return jsonify({
+					"msg": "user not found"
+				}), 404
+
+
 
 
 # this only runs if `$ python src/main.py` is executed
