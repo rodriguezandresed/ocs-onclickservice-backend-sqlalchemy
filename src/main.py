@@ -274,7 +274,7 @@ def handle_edit_servicio(user_id = None):
 def handle_add_orden():
 # def handle_add_favorite(nature, name_id):
 	body=request.json
-	body_service=body.get("nombre_tipo_sub_servicio", None)
+	body_service=body.get("nombre_tipo_servicio", None)
 	body_proveedor=body.get("nombre_proveedor", None)
 # creo que no hace falta, [update] lo que no es *****
 #	body_nature=body.get("favorite_nature", None)
@@ -283,7 +283,7 @@ def handle_add_orden():
 		user = get_jwt_identity()
 		cliente_asignado = User.query.filter_by(id=user).first()
 		proveedor_asignado = User.query.filter_by(nombre=body_proveedor).first()
-		servicio = TipoServicio.query.filter_by(nombre_tipo_sub_servicio=body_service,  proveedor_id=proveedor_asignado.id ).first()
+		servicio = TipoServicio.query.filter_by(nombre_tipo_servicio=body_service,  proveedor_id=proveedor_asignado.id ).first()
 
 		if user is not None:
 					orden_servicio= OrdenServicio.query.filter_by(detalle_servicio_id=servicio.id, cliente_id=cliente_asignado.id, proveedor_id=proveedor_asignado.id).first()
