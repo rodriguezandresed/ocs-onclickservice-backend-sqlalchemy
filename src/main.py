@@ -2,26 +2,38 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
+from datetime import datetime, timedelta, timezone
 from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, TipoServicio, EvaluacionProveedor, OrdenServicio, TiposServicio 
+from models import db, User, TipoServicio, EvaluacionProveedor, OrdenServicio, TiposServicio, TokenBlocklist
 #from models import Person
 
 app = Flask(__name__)
+ACCESS_EXPIRES = timedelta(hours=1)
 app.url_map.strict_slashes = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config["JWT_SECRET_KEY"]=os.environ.get("horse cat mouse")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = ACCESS_EXPIRES
 jwt = JWTManager(app)
 MIGRATE = Migrate(app, db)
 db.init_app(app)
 CORS(app)
 setup_admin(app)
+
+
+@jwt.token_in_blocklist_loader
+def check_if_token_revoked(jwt_header, jwt_payload: dict) -> bool:
+    jti = jwt_payload["jti"]
+    token = db.session.query(TokenBlocklist.id).filter_by(jti=jti).scalar()
+
+    return token is not None
+
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
@@ -376,7 +388,7 @@ def handle_add_orden():
 # 			db.session.rollback()
 # 			return jsonify(error.args)
 
-
+# HABILITAR EL BORRADO
 # 	if request.method == 'DELETE':		
 # 		service_delete = TipoServicio.query.filter_by(nombre_tipo_sub_servicio=body_name, proveedor_id=user).first()
 # 		if service_delete is None:
@@ -392,6 +404,8 @@ def handle_add_orden():
 # 		except Exception as error:
 # 			db.session.rollback()
 # 			return jsonify(error.args)
+
+
 @app.route('/servicios/', methods=['GET'])
 
 def handle_tipo_servicios():
@@ -404,7 +418,21 @@ def handle_tipo_servicios():
 					"msg": "user not found"
 				}), 404
 
+@app.route("/logout", methods=["DELETE"])
+@jwt_required()
+def modify_token():
+    jti = get_jwt()["jti"]
+    now = datetime.now(timezone.utc)
+    db.session.add(TokenBlocklist(jti=jti, created_at=now))
+    db.session.commit()
+    return jsonify(msg="JWT revoked")
 
+
+# A blocklisted access token will not be able to access this any more
+@app.route("/protected", methods=["GET"])
+@jwt_required()
+def protected():
+    return jsonify(hello="world")
 
 
 # this only runs if `$ python src/main.py` is executed
