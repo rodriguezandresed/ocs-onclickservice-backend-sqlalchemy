@@ -39,7 +39,10 @@ class User(db.Model):
     fecha_activacion = db.Column(db.Date)
     direccion = db.Column(db.String(250))
     telefono = db.Column(db.String(250))
-
+    __table_args__ = (db.UniqueConstraint(
+	"id","nombre","email","social","telefono",
+	name="debe_tener_una_sola_coincidencia"
+    ),)
 
     def __repr__(self):
         return '<User %r>' % self.nombre
@@ -68,7 +71,6 @@ class TipoServicio(db.Model):
     # Here we define columns for the table person
     # Notice that each db.Column is also a normal Python instance attribute.
     id = db.Column(db.Integer, primary_key=True)
-    proveedor_id= db.Column(db.Integer, db.ForeignKey('user.id') )
     status_active = db.Column(db.Boolean)
     nombre_tipo_servicio = db.Column(db.Enum(TiposServicio), nullable=False)
     nombre_tipo_sub_servicio = db.Column(db.String(250), nullable=False)
@@ -142,8 +144,8 @@ class EvaluacionProveedor(db.Model):
     # Here we define columns for the table person
     # Notice that each db.Column is also a normal Python instance attribute.
     id = db.Column(db.Integer, primary_key=True)
-    comentario = db.Column(db.String(250), nullable=False)
-    evaluate_status = db.Column(db.Boolean, nullable=False)
+    comentario = db.Column(db.String(250))
+    evaluate_status = db.Column(db.Boolean)
     resultado_evaluacion= db.Column(db.Float, nullable=False)
     #Defining Foreign Keys
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
@@ -253,20 +255,55 @@ class TokenBlocklist(db.Model):
     jti = db.Column(db.String(36), nullable=False, index=True)
     created_at = db.Column(db.DateTime, nullable=False)
 
+class SolicitudEdo(db.Model):
+    __tablename__ = 'tipo_servicio'
+    # Here we define columns for the table person
+    # Notice that each db.Column is also a normal Python instance attribute.
+    id = db.Column(db.Integer, primary_key=True)
+    status_active = db.Column(db.Boolean)
+    num_ref = db.Column(db.String(250), nullable=False)
+    comentarios = db.Column(db.String(250))
+    #Defining Foreign Keys
+    proveedor_id= db.Column(db.Integer, db.ForeignKey('user.id') )
+    #Defining Relationships
+    proveedor = db.relationship("User", foreign_keys=[proveedor_id])
+
+    __table_args__ = (db.UniqueConstraint(
+	"id","proveedor_id","num_ref",
+	name="debe_tener_una_sola_coincidencia"
+    ),)
 
 
-    @classmethod
-    def create(cls, data):
-        # creamos instancia
-        instance = cls(**data)
-        if (not isinstance(instance, cls)):
-            print("We failed")
-            return None
-        db.session.add(instance)
-        try:
-            db.session.commit()
-            print(f"Created: {instance.name}")
-            return instance
-        except Exception as error:
-            db.session.rollback()
-            print(error.args)
+    def __repr__(self):
+        return f'<Tipo de Servicio> {self.nombre_tipo_servicio}'
+
+    def serialize(self):
+        return{
+            "id":self.id,
+            "num_ref":self.num_ref,
+            "proveedor":self.proveedor.serialize(),
+            "status_active":self.status_active,
+        }
+
+    def __init__(self, *args, **kwargs):
+        """
+            "name":"andres",
+            "lastname":"rodriguez"
+
+
+        """
+      
+
+        for (key, value) in kwargs.items():
+            if hasattr(self, key):
+                attr_type = getattr(self.__class__, key).type
+
+                try:
+                    attr_type.python_type(value)
+                    setattr(self, key, value)
+                except Exception as error:
+                    print(f"ignota los demas valores: {error.args}")
+
+
+
+    

@@ -10,7 +10,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, TipoServicio, EvaluacionProveedor, OrdenServicio, TiposServicio, TokenBlocklist
+from models import db, User, TipoServicio, EvaluacionProveedor, OrdenServicio, TiposServicio, TokenBlocklist, SolicitudEdo
 #from models import Person
 
 app = Flask(__name__)
@@ -433,6 +433,96 @@ def modify_token():
 @jwt_required()
 def protected():
     return jsonify(hello="world")
+
+
+
+@app.route('/solicitud_status', methods=['POST'])
+# @app.route('/proveedores/<string:nature>/<int:name_id>', methods=['POST'])
+@jwt_required()
+def handle_add_servicio():
+# def handle_add_favorite(nature, name_id):
+	body=request.json
+	body_name=body.get("num_ref", None)
+# creo que no hace falta, [update] lo que no es *****
+#	body_nature=body.get("favorite_nature", None)
+
+	if body_name is not  None:
+		user = get_jwt_identity()
+		user_status = User.query.filter_by(id=user).one_or_none()
+		if user is not None:
+					solicitud_edo= SolicitudEdo.query.filter_by(proveedor_id=user).first()
+					#aca debo incluir una logica con el status de usuario
+					if solicitud_edo is not None:
+							return jsonify({
+								"msg":"Ya tu tienes el estado de proveedor!"
+							})
+					else:
+						#aca hay que agregar la fecha de cuando se pago
+						solicitud_edo = SolicitudEdo(num_ref=body["num_ref"], proveedor_id=user )	
+						try:
+							db.session.add(solicitud_edo)
+							db.session.commit()
+							print(solicitud_edo)
+							return jsonify(solicitud_edo.serialize()), 201
+						except Exception as error:
+							db.session.rollback()
+							return jsonify(error.args), 500
+		else:
+				return jsonify({
+								"msg": "Por favor entra en tu usuario!"
+								}), 400
+	else:
+		return jsonify({
+						"msg": "Algo paso, intentalo nuevamente [bad body format]"
+						}), 400
+
+
+@app.route('/evaluar', methods=['POST'])
+# @app.route('/proveedores/<string:nature>/<int:name_id>', methods=['POST'])
+@jwt_required()
+def handle_add_orden():
+# def handle_add_favorite(nature, name_id):
+	body=request.json
+	body_service=body.get("nombre_tipo_servicio", None)
+	body_proveedor=body.get("nombre_proveedor", None)
+# creo que no hace falta, [update] lo que no es *****
+#	body_nature=body.get("favorite_nature", None)
+
+	if body_service is not  None:
+		user = get_jwt_identity()
+		cliente_asignado = User.query.filter_by(id=user).first()
+		proveedor_asignado = User.query.filter_by(nombre=body_proveedor).first()
+		servicio = TipoServicio.query.filter_by(nombre_tipo_servicio=body_service,  proveedor_id=proveedor_asignado.id ).first()
+		orden_servicio= OrdenServicio.query.filter_by(detalle_servicio_id=servicio.id, cliente_id=cliente_asignado.id, proveedor_id=proveedor_asignado.id).first()
+		print(orden_servicio)
+		#falta hacer una logica con la orden de servicio
+		if user is not None:
+					evaluacion_proveedor= EvaluacionProveedor.query.filter_by(detalle_servicio_id=servicio.id, cliente_id=cliente_asignado.id, proveedor_id=proveedor_asignado.id).first()
+					print(evaluacion_proveedor)
+					if evaluacion_proveedor is not None:
+							return jsonify({
+								"msg":"La evaluacion por este servicio ya existe en tu perfil!"
+							})
+					else:
+						evaluacion_proveedor = EvaluacionProveedor(detalle_servicio_id=servicio.id, proveedor_id=proveedor_asignado.id, cliente_id=cliente_asignado.id, resultado_evaluacion=body["resultado_evaluacion"])	
+						print(evaluacion_proveedor)
+						try:
+							db.session.add(evaluacion_proveedor)
+							db.session.commit()
+							return jsonify(evaluacion_proveedor.serialize()), 201
+						except Exception as error:
+							db.session.rollback()
+							return jsonify(error.args), 500
+		else:
+				return jsonify({
+								"msg": "Por favor entra en tu usuario!"
+								}), 400
+	else:
+		return jsonify({
+						"msg": "Algo paso, intentalo nuevamente [bad body format]"
+						}), 400
+
+
 
 
 # this only runs if `$ python src/main.py` is executed
