@@ -439,7 +439,7 @@ def protected():
 @app.route('/solicitud_status', methods=['POST'])
 # @app.route('/proveedores/<string:nature>/<int:name_id>', methods=['POST'])
 @jwt_required()
-def handle_add_servicio():
+def handle_solicitud_servicios():
 # def handle_add_favorite(nature, name_id):
 	body=request.json
 	body_name=body.get("num_ref", None)
@@ -480,7 +480,7 @@ def handle_add_servicio():
 @app.route('/evaluar', methods=['POST'])
 # @app.route('/proveedores/<string:nature>/<int:name_id>', methods=['POST'])
 @jwt_required()
-def handle_add_orden():
+def handle_evaluacion():
 # def handle_add_favorite(nature, name_id):
 	body=request.json
 	body_service=body.get("nombre_tipo_servicio", None)

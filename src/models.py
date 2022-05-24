@@ -40,7 +40,7 @@ class User(db.Model):
     direccion = db.Column(db.String(250))
     telefono = db.Column(db.String(250))
     __table_args__ = (db.UniqueConstraint(
-	"id","nombre","email","social","telefono",
+	"id","email","social","telefono",
 	name="debe_tener_una_sola_coincidencia"
     ),)
 
