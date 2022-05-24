@@ -256,7 +256,7 @@ class TokenBlocklist(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
 
 class SolicitudEdo(db.Model):
-    __tablename__ = 'tipo_servicio'
+    __tablename__ = 'solicitud_edo'
     # Here we define columns for the table person
     # Notice that each db.Column is also a normal Python instance attribute.
     id = db.Column(db.Integer, primary_key=True)
