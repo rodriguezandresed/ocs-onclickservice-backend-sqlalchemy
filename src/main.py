@@ -504,7 +504,7 @@ def handle_evaluacion():
 								"msg":"La evaluacion por este servicio ya existe en tu perfil!"
 							})
 					else:
-						evaluacion_proveedor = EvaluacionProveedor(detalle_servicio_id=servicio.id, proveedor_id=proveedor_asignado.id, cliente_id=cliente_asignado.id, resultado_evaluacion=body["resultado_evaluacion"])	
+						evaluacion_proveedor = EvaluacionProveedor(detalle_servicio_id=servicio.id, proveedor_id=proveedor_asignado.id, cliente_id=cliente_asignado.id, resultado_evaluacion=body["resultado_evaluacion"], comentario=body["comentario"])	
 						print(evaluacion_proveedor)
 						try:
 							db.session.add(evaluacion_proveedor)
