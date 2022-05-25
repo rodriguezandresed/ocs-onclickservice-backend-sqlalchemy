@@ -166,9 +166,9 @@ class EvaluacionProveedor(db.Model):
             "id":self.id,
             "comentario":self.comentario,
             "evaluate_status":self.evaluate_status,
-            "detalle_servicio_evaluado":self.detalle_servicio_evaluado,
-            "proveedor_id":self.user_proveedor,
-            "cliente_id":self.user_cliente,
+            "detalle_servicio":self.detalle_servicio.serialize(),
+            "proveedor_id":self.proveedor_evaluado.serialize(),
+            "cliente_id":self.cliente_evaluador.serialize(),
             "resultado_evaluacion":self.resultado_evaluacion,
         }
 

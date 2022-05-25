@@ -156,14 +156,10 @@ def handle_login():
 
 
 @app.route('/agregar', methods=['POST'])
-# @app.route('/proveedores/<string:nature>/<int:name_id>', methods=['POST'])
 @jwt_required()
 def handle_add_servicio():
-# def handle_add_favorite(nature, name_id):
 	body=request.json
 	body_name=body.get("nombre_tipo_sub_servicio", None)
-# creo que no hace falta, [update] lo que no es *****
-#	body_nature=body.get("favorite_nature", None)
 
 	if body_name is not  None:
 		user = get_jwt_identity()
@@ -195,7 +191,6 @@ def handle_add_servicio():
 						}), 400
 
 @app.route('/proveedores/', methods=['GET'])
-#@app.route('/proveedores/<int:user_id>', methods=['GET'])
 @app.route('/proveedores/<string:tipo_servicio>', methods=['GET'])
 def handle_proveedores(tipo_servicio = None):
 	if request.method == 'GET':
@@ -278,18 +273,14 @@ def handle_edit_servicio(user_id = None):
 			db.session.rollback()
 			return jsonify(error.args)
 
-# A PARTIR DE ACA SE TRABAJA EN LA CREACION DE ORDENES DE SERVICIO
 
 @app.route('/contratar', methods=['POST'])
-# @app.route('/proveedores/<string:nature>/<int:name_id>', methods=['POST'])
 @jwt_required()
 def handle_add_orden():
-# def handle_add_favorite(nature, name_id):
 	body=request.json
 	body_service=body.get("nombre_tipo_servicio", None)
 	body_proveedor=body.get("nombre_proveedor", None)
-# creo que no hace falta, [update] lo que no es *****
-#	body_nature=body.get("favorite_nature", None)
+
 
 	if body_service is not  None:
 		user = get_jwt_identity()
@@ -323,87 +314,34 @@ def handle_add_orden():
 						"msg": "Algo paso, intentalo nuevamente [bad body format]"
 						}), 400
 
-# @app.route('/ordenes/', methods=['GET'])
-# @app.route('/orden/<int:user_id>', methods=['GET'])
-# def handle_proveedores(user_id = None):
-# 	if request.method == 'GET':
-# 		if user_id  is None:
-# 			servicios = TipoServicio.query.all()
-# 			servicios = list(map(lambda servicio: servicio.serialize(), servicios))
-# 			return jsonify(servicios),200
-# 		else:
-# 			servicios = TipoServicio.query.filter_by(proveedor_id=user_id).all()
-# 			servicios = list(map(lambda servicio: servicio.serialize(), servicios))
-# 			print(servicios)
-# 			if servicios is not None:
-# 				return jsonify(servicios),200
-# 			else:
-# 				return jsonify({
-# 					"msg": "user not found"
-# 				}), 404
+@app.route('/contratos_pendientes', methods=['GET'])
+@jwt_required()
+def handle_contratos_pendientes():
+	if request.method == 'GET':
+		user = get_jwt_identity()
+		pendientes = OrdenServicio.query.filter_by(proveedor_id=user, status_orden_progreso=True).all()
+		pendientes_existentes = list(map(lambda pendiente: pendiente.serialize(), pendientes))
+		if len(pendientes) > 0:
+			return jsonify(pendientes_existentes),200
+		else:
+			return jsonify({
+				"msg": "No hay contratos pendientes"
+			}), 404
 
 
-
-# @app.route('/editar_orden/', methods=['PUT', 'DELETE'])
-# @jwt_required()
-# def handle_edit_servicio(user_id = None):
-# 	user = get_jwt_identity()
-# 	body = request.json
-# 	body_name=body.get("nombre_tipo_sub_servicio", None)
-
-# 	if request.method == 'PUT':
-# 		if not body.get("nombre_tipo_sub_servicio"):
-# 			return jsonify({
-# 				"msg": "something happened, try again"
-# 			}), 400
-
-# 		if not body.get("nombre_tipo_servicio"):
-# 			return jsonify({
-# 				"msg": "something happened, try again"
-# 			}), 400
-
-# 		if not body.get("detalle_tipo_servicio"):
-# 			return jsonify({
-# 				"msg": "something happened, try again"
-# 			}), 400
-
-
-# 		service_update = TipoServicio.query.filter_by(nombre_tipo_sub_servicio=body_name, proveedor_id=user).first()
-
-# 		if service_update is None:
-# 			return jsonify({
-# 				"msg": "No se encuentra el servicio"
-# 			}), 404
-
-# 		servicio = TipoServicio(nombre_tipo_servicio=body["nombre_tipo_servicio"], nombre_tipo_sub_servicio=body["nombre_tipo_sub_servicio"],detalle_tipo_servicio=body["detalle_tipo_servicio"], proveedor_id=user )
-		
-# 		try:
-
-# 			service_update.nombre_tipo_servicio = body.get("nombre_tipo_servicio")
-# 			service_update.nombre_tipo_sub_servicio = body.get("nombre_tipo_sub_servicio")
-# 			service_update.detalle_tipo_servicio = body.get("detalle_tipo_servicio")
-# 			db.session.commit()
-# 			return jsonify(user.serialize()), 201
-# 		except Exception as error:
-# 			db.session.rollback()
-# 			return jsonify(error.args)
-
-# HABILITAR EL BORRADO
-# 	if request.method == 'DELETE':		
-# 		service_delete = TipoServicio.query.filter_by(nombre_tipo_sub_servicio=body_name, proveedor_id=user).first()
-# 		if service_delete is None:
-# 			return jsonify({
-# 				"msg": "No se encuentra el servicio"
-# 			}), 404
-			
-# 		db.session.delete(service_delete)
-		
-# 		try: 
-# 			db.session.commit()
-# 			return jsonify([]), 204
-# 		except Exception as error:
-# 			db.session.rollback()
-# 			return jsonify(error.args)
+@app.route('/pedidos_pendientes', methods=['GET'])
+@jwt_required()
+def handle_pedidos_pendientes():
+	if request.method == 'GET':
+		user = get_jwt_identity()
+		pedidos = OrdenServicio.query.filter_by(cliente_id=user, status_orden_progreso=True).all()
+		pedidos_existentes = list(map(lambda pedido: pedido.serialize(), pedidos))
+		if len(pedidos) > 0:
+			return jsonify(pedidos_existentes),200
+		else:
+			return jsonify({
+				"msg": "No hay pedidos pendientes"
+			}), 404
 
 
 @app.route('/servicios/', methods=['GET'])
@@ -437,14 +375,11 @@ def protected():
 
 
 @app.route('/solicitud_status', methods=['POST'])
-# @app.route('/proveedores/<string:nature>/<int:name_id>', methods=['POST'])
 @jwt_required()
 def handle_solicitud_servicios():
-# def handle_add_favorite(nature, name_id):
 	body=request.json
 	body_name=body.get("num_ref", None)
-# creo que no hace falta, [update] lo que no es *****
-#	body_nature=body.get("favorite_nature", None)
+
 
 	if body_name is not  None:
 		user = get_jwt_identity()
@@ -454,7 +389,7 @@ def handle_solicitud_servicios():
 					#aca debo incluir una logica con el status de usuario
 					if solicitud_edo is not None:
 							return jsonify({
-								"msg":"Ya tu tienes el estado de proveedor!"
+								"msg":"Ya tu tienes una solicitud en progreso!"
 							})
 					else:
 						#aca hay que agregar la fecha de cuando se pago
@@ -478,33 +413,31 @@ def handle_solicitud_servicios():
 
 
 @app.route('/evaluar', methods=['POST'])
-# @app.route('/proveedores/<string:nature>/<int:name_id>', methods=['POST'])
 @jwt_required()
 def handle_evaluacion():
-# def handle_add_favorite(nature, name_id):
+
 	body=request.json
 	body_service=body.get("nombre_tipo_servicio", None)
 	body_proveedor=body.get("nombre_proveedor", None)
-# creo que no hace falta, [update] lo que no es *****
-#	body_nature=body.get("favorite_nature", None)
+
 
 	if body_service is not  None:
 		user = get_jwt_identity()
 		cliente_asignado = User.query.filter_by(id=user).first()
+		print(cliente_asignado)
 		proveedor_asignado = User.query.filter_by(nombre=body_proveedor).first()
 		servicio = TipoServicio.query.filter_by(nombre_tipo_servicio=body_service,  proveedor_id=proveedor_asignado.id ).first()
-		orden_servicio= OrdenServicio.query.filter_by(detalle_servicio_id=servicio.id, cliente_id=cliente_asignado.id, proveedor_id=proveedor_asignado.id).first()
-		print(orden_servicio)
+		#orden_servicio= OrdenServicio.query.filter_by(detalle_servicio_id=servicio.id, cliente_id=cliente_asignado.id, proveedor_id=proveedor_asignado.id).first()
 		#falta hacer una logica con la orden de servicio
 		if user is not None:
-					evaluacion_proveedor= EvaluacionProveedor.query.filter_by(detalle_servicio_id=servicio.id, cliente_id=cliente_asignado.id, proveedor_id=proveedor_asignado.id).first()
+					evaluacion_proveedor= EvaluacionProveedor.query.filter_by(detalle_servicio_id=servicio.id, cliente_evaluador_id=cliente_asignado.id, proveedor_evaluado_id=proveedor_asignado.id).first()
 					print(evaluacion_proveedor)
 					if evaluacion_proveedor is not None:
 							return jsonify({
 								"msg":"La evaluacion por este servicio ya existe en tu perfil!"
 							})
 					else:
-						evaluacion_proveedor = EvaluacionProveedor(detalle_servicio_id=servicio.id, proveedor_id=proveedor_asignado.id, cliente_id=cliente_asignado.id, resultado_evaluacion=body["resultado_evaluacion"], comentario=body["comentario"])	
+						evaluacion_proveedor = EvaluacionProveedor(detalle_servicio_id=servicio.id, proveedor_evaluado_id=proveedor_asignado.id, cliente_evaluador_id=cliente_asignado.id, resultado_evaluacion=body["resultado_evaluacion"], comentario=body["comentario"])	
 						print(evaluacion_proveedor)
 						try:
 							db.session.add(evaluacion_proveedor)
@@ -522,7 +455,34 @@ def handle_evaluacion():
 						"msg": "Algo paso, intentalo nuevamente [bad body format]"
 						}), 400
 
+@app.route('/evaluaciones_recibidas', methods=['GET'])
+@jwt_required()
+def handle_evaluaciones_recibidas():
+	if request.method == 'GET':
+		user = get_jwt_identity()
+		evaluaciones = EvaluacionProveedor.query.filter_by(proveedor_evaluado_id=user).all()
+		evaluaciones_existentes = list(map(lambda evaluacion: evaluacion.serialize(), evaluaciones))
+		if len(evaluaciones) > 0:
+			return jsonify(evaluaciones_existentes),200
+		else:
+			return jsonify({
+				"msg": "Nadie te ha evaluado!"
+			}), 404
 
+
+@app.route('/evaluaciones_realizadas', methods=['GET'])
+@jwt_required()
+def handle_evaluaciones_realizadas():
+	if request.method == 'GET':
+		user = get_jwt_identity()
+		evaluaciones = EvaluacionProveedor.query.filter_by(cliente_evaluador_id=user).all()
+		evaluaciones_existentes = list(map(lambda evaluacion: evaluacion.serialize(), evaluaciones))
+		if len(evaluaciones) > 0:
+			return jsonify(evaluaciones_existentes),200
+		else:
+			return jsonify({
+				"msg": "No tienes evaluaciones realizadas!"
+			}), 404
 
 
 # this only runs if `$ python src/main.py` is executed
