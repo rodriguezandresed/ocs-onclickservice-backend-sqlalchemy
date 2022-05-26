@@ -344,6 +344,102 @@ def handle_pedidos_pendientes():
 			}), 404
 
 
+
+@app.route('/editar_orden_proveedor/', methods=['PUT'])
+@jwt_required()
+def handle_edit_orden_proveedor(user_id = None):
+	user = get_jwt_identity()
+	body = request.json
+	body_cliente=body.get("cliente_id", None)
+	cliente_asignado = User.query.filter_by(id=body_cliente).first()
+	print(cliente_asignado)
+	if request.method == 'PUT':
+		if body.get("status_orden_recibida") is None:
+			return jsonify({
+				"msg": "something happened, try again"
+			}), 400
+
+		if body.get("status_orden_aceptada") is None:
+			return jsonify({
+				"msg": "something happened, try again"
+			}), 400
+
+		if body.get("status_orden_cancelada") is None:
+			return jsonify({
+				"msg": "something happened, try again"
+			}), 400
+			
+
+		service_update = OrdenServicio.query.filter_by(proveedor_id=user, cliente_id=cliente_asignado.id).first()
+
+		if service_update is None:
+			return jsonify({
+				"msg": "No se encuentra el servicio"
+			}), 404
+
+		servicio = OrdenServicio(status_orden_recibida=body["status_orden_recibida"], status_orden_cancelada=body["status_orden_cancelada"],status_orden_aceptada=body["status_orden_aceptada"] )
+		
+		try:
+
+			service_update.status_orden_recibida = body.get("status_orden_recibida")
+			service_update.status_orden_cancelada = body.get("status_orden_cancelada")
+			service_update.status_orden_aceptada = body.get("status_orden_aceptada")
+			db.session.commit()
+			return jsonify(user.serialize()), 201
+		except Exception as error:
+			db.session.rollback()
+			return jsonify(error.args)
+
+
+
+@app.route('/editar_orden_cliente/', methods=['PUT'])
+@jwt_required()
+def handle_edit_orden_cliente(user_id = None):
+	user = get_jwt_identity()
+	body = request.json
+	body_proveedor=body.get("proveedor_id", None)
+	proveedor_asignado = User.query.filter_by(id=body_proveedor).first()
+
+	if request.method == 'PUT':
+		if  body.get("status_orden_recibida") is None:
+			return jsonify({
+				"msg": "something happened, try again"
+			}), 400
+
+		if  body.get("status_orden_aceptada") is None:
+			return jsonify({
+				"msg": "something happened, try again"
+			}), 400
+
+		if body.get("status_orden_cancelada") is None:
+			return jsonify({
+				"msg": "something happened, try again"
+			}), 400
+			
+
+		service_update = OrdenServicio.query.filter_by(proveedor_id=proveedor_asignado.id, cliente_id=user).first()
+
+		if service_update is None:
+			return jsonify({
+				"msg": "No se encuentra el servicio"
+			}), 404
+
+		servicio = OrdenServicio(status_orden_recibida=body["status_orden_recibida"], status_orden_cancelada=body["status_orden_cancelada"],status_orden_aceptada=body["status_orden_aceptada"] )
+		
+		try:
+
+			service_update.status_orden_recibida = body.get("status_orden_recibida")
+			service_update.status_orden_cancelada = body.get("status_orden_cancelada")
+			service_update.status_orden_aceptada = body.get("status_orden_aceptada")
+			db.session.commit()
+			return jsonify(user.serialize()), 201
+		except Exception as error:
+			db.session.rollback()
+			return jsonify(error.args)
+
+
+
+
 @app.route('/servicios/', methods=['GET'])
 
 def handle_tipo_servicios():
