@@ -1,3 +1,4 @@
+from collections import UserList
 from flask_sqlalchemy import SQLAlchemy
 import enum
 
@@ -39,6 +40,7 @@ class User(db.Model):
     fecha_activacion = db.Column(db.Date)
     direccion = db.Column(db.String(250))
     telefono = db.Column(db.String(250))
+    servicios = db.relationship('TipoServicio', backref='user', uselist=True)
     __table_args__ = (db.UniqueConstraint(
 	"id","email","social","telefono",
 	name="debe_tener_una_sola_coincidencia"
@@ -61,7 +63,8 @@ class User(db.Model):
             "imagen":self.imagen,  
             "social":self.social,
             "direccion":self.direccion,
-            "telefono":self.telefono,              
+            "telefono":self.telefono,
+            "servicio":[test.serialize() for test in self.servicios ]              
 			#do not serialize the password, it's a security breach
 		}
 
@@ -78,7 +81,7 @@ class TipoServicio(db.Model):
     #Defining Foreign Keys
     proveedor_id= db.Column(db.Integer, db.ForeignKey('user.id') )
     #Defining Relationships
-    proveedor = db.relationship("User", foreign_keys=[proveedor_id])
+  #  proveedor = db.relationship("User", foreign_keys=[proveedor_id])
 
     __table_args__ = (db.UniqueConstraint(
 	"id","proveedor_id","nombre_tipo_servicio","nombre_tipo_sub_servicio","detalle_tipo_servicio","status_active",
@@ -97,7 +100,7 @@ class TipoServicio(db.Model):
             "nombre":self.nombre_tipo_servicio,
             "sub_servicio":self.nombre_tipo_sub_servicio,
             "detalle":self.detalle_tipo_servicio,
-            "proveedor":self.proveedor.serialize(),
+         #   "proveedor":self.proveedor.serialize(),
             "nombre_tipo_servicio":self.nombre_tipo_servicio,
         }
 
