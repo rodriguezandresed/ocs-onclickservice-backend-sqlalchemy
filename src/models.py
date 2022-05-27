@@ -40,6 +40,7 @@ class User(db.Model):
     fecha_activacion = db.Column(db.Date)
     direccion = db.Column(db.String(250))
     telefono = db.Column(db.String(250))
+    avg_evaluacion = db.Column(db.Float)
     servicios = db.relationship('TipoServicio', backref='user', uselist=True)
     __table_args__ = (db.UniqueConstraint(
 	"id","email","social","telefono",
@@ -50,6 +51,14 @@ class User(db.Model):
         return '<User %r>' % self.nombre
 
     def serialize(self):
+        evaluaciones =EvaluacionProveedor.query.filter_by(proveedor_evaluado_id=self.id).all()
+        total = 0
+        for evaluacion in evaluaciones:
+            sentinel=evaluacion.avg().get('resultado_evaluacion')
+            total = sentinel + total
+        if len(evaluaciones) == 0:
+            avg = 0
+        else: avg=total/len(evaluaciones)
         return {
 			"id": self.id,
             "nombre": self.nombre,
@@ -64,6 +73,7 @@ class User(db.Model):
             "social":self.social,
             "direccion":self.direccion,
             "telefono":self.telefono,
+            "avg_evaluacion":round(avg),
             "servicio":[sentinel.serialize() for sentinel in self.servicios ]              
 			#do not serialize the password, it's a security breach
 		}
@@ -190,6 +200,12 @@ class EvaluacionProveedor(db.Model):
             "detalle_servicio":self.detalle_servicio.serialize(),
             "proveedor_id":self.proveedor_evaluado.serialize(),
             "cliente_id":self.cliente_evaluador.serialize(),
+            "resultado_evaluacion":self.resultado_evaluacion,
+        }
+
+
+    def avg(self):
+        return{
             "resultado_evaluacion":self.resultado_evaluacion,
         }
 
