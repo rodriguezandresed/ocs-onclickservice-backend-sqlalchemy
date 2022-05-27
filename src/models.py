@@ -69,6 +69,24 @@ class User(db.Model):
 		}
 
 
+    def simplify(self):
+        return {
+			"id": self.id,
+            "nombre": self.nombre,
+			"email": self.email,
+            "fecha_registro":self.fecha_registro,
+            "tipo_usuario":self.tipo_usuario,
+            "cliente_activo":self.cliente_activo,
+            "proveedor_activo":self.proveedor_activo,           
+            "detalle":self.detalle,
+            "fecha_activacion":self.fecha_activacion,
+            "imagen":self.imagen,  
+            "social":self.social,
+            "direccion":self.direccion,
+            "telefono":self.telefono,
+            }
+
+
 class TipoServicio(db.Model):
     __tablename__ = 'tipo_servicio'
     # Here we define columns for the table person
@@ -80,8 +98,7 @@ class TipoServicio(db.Model):
     detalle_tipo_servicio = db.Column(db.String(250), nullable=False)
     #Defining Foreign Keys
     proveedor_id= db.Column(db.Integer, db.ForeignKey('user.id') )
-    #Defining Relationships
-  #  proveedor = db.relationship("User", foreign_keys=[proveedor_id])
+
 
     __table_args__ = (db.UniqueConstraint(
 	"id","proveedor_id","nombre_tipo_servicio","nombre_tipo_sub_servicio","detalle_tipo_servicio","status_active",
@@ -93,6 +110,7 @@ class TipoServicio(db.Model):
         return f'<Tipo de Servicio> {self.nombre_tipo_servicio}'
 
     def serialize(self):
+        user =User.query.filter_by(id=self.proveedor_id).first()
         return{
             "id":self.id,
             "proveedor_id":self.proveedor_id,
@@ -100,8 +118,8 @@ class TipoServicio(db.Model):
             "nombre":self.nombre_tipo_servicio,
             "sub_servicio":self.nombre_tipo_sub_servicio,
             "detalle":self.detalle_tipo_servicio,
-            "proveedor":self.proveedor_id,
             "nombre_tipo_servicio":self.nombre_tipo_servicio,
+            "proveedor":user.simplify(),
         }
 
     def __init__(self, *args, **kwargs):
