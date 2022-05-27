@@ -100,7 +100,7 @@ class TipoServicio(db.Model):
             "nombre":self.nombre_tipo_servicio,
             "sub_servicio":self.nombre_tipo_sub_servicio,
             "detalle":self.detalle_tipo_servicio,
-         #   "proveedor":self.proveedor.serialize(),
+            "proveedor":self.proveedor_id,
             "nombre_tipo_servicio":self.nombre_tipo_servicio,
         }
 
