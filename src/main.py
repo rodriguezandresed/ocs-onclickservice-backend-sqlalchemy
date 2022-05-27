@@ -154,6 +154,21 @@ def handle_login():
 			"msg": "something happened, try again"
 		}), 400	
 
+@app.route('/profile', methods=['GET'])
+@jwt_required()
+def handle_profile():
+	user = get_jwt_identity()
+	if request.method == 'GET':
+		if user  is not None:
+			user = User.query.filter_by(id=user).first()
+			return jsonify(user.serialize()),200
+		else:
+			return jsonify({
+					"msg": "user not found"
+				}), 404
+
+
+
 
 @app.route('/agregar', methods=['POST'])
 @jwt_required()

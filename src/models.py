@@ -64,7 +64,7 @@ class User(db.Model):
             "social":self.social,
             "direccion":self.direccion,
             "telefono":self.telefono,
-            "servicio":[test.serialize() for test in self.servicios ]              
+            "servicio":[sentinel.serialize() for sentinel in self.servicios ]              
 			#do not serialize the password, it's a security breach
 		}
 
