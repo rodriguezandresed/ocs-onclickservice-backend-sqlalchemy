@@ -80,6 +80,14 @@ class User(db.Model):
 
 
     def simplify(self):
+        evaluaciones =EvaluacionProveedor.query.filter_by(proveedor_evaluado_id=self.id).all()
+        total = 0
+        for evaluacion in evaluaciones:
+            sentinel=evaluacion.avg().get('resultado_evaluacion')
+            total = sentinel + total
+        if len(evaluaciones) == 0:
+            avg = 0
+        else: avg=total/len(evaluaciones)
         return {
 			"id": self.id,
             "nombre": self.nombre,
@@ -94,6 +102,7 @@ class User(db.Model):
             "social":self.social,
             "direccion":self.direccion,
             "telefono":self.telefono,
+            "avg_evaluacion":round(avg),
             }
 
 
@@ -262,8 +271,8 @@ class OrdenServicio(db.Model):
             "status_orden_aceptada":self.status_orden_aceptada,
             "status_orden_progreso":self.status_orden_progreso,
             "detalle_servicio_id":self.detalle_servicio_id,
-            "proveedor_id":self.proveedor_id,
-            "cliente_id":self.cliente_id,
+            "proveedor":self.proveedor.simplify(),
+            "cliente":self.cliente.simplify(),
             "orden_detalle_servicio":self.detalle_servicio.serialize(),
         }
 
