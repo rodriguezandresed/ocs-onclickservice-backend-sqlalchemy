@@ -143,8 +143,8 @@ class TipoServicio(db.Model):
 
     def __init__(self, *args, **kwargs):
         """
-            "name":"andres",
-            "lastname":"rodriguez"
+            "name":"",
+            "lastname":""
 
 
         """
@@ -220,8 +220,8 @@ class EvaluacionProveedor(db.Model):
 
     def __init__(self, *args, **kwargs):
         """
-            "name":"andres",
-            "lastname":"rodriguez"
+            "name":"",
+            "lastname":""
 
 
         """
@@ -281,8 +281,8 @@ class OrdenServicio(db.Model):
 
     def __init__(self, *args, **kwargs):
         """
-            "name":"andres",
-            "lastname":"rodriguez"
+            "name":"",
+            "lastname":""
 
 
         """
@@ -336,8 +336,8 @@ class SolicitudEdo(db.Model):
 
     def __init__(self, *args, **kwargs):
         """
-            "name":"andres",
-            "lastname":"rodriguez"
+            "name":"",
+            "lastname":""
 
 
         """
