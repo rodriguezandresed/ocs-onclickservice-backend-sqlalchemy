@@ -68,10 +68,10 @@ def handle_user(user_id = None):
 				"msg": "something happened, try again"				
 			}), 400
 
-		if not body.get("password"):
-			return jsonify({
-				"msg": "something happened, try again"				
-			}), 400
+		# if not body.get("password"):
+		# 	return jsonify({
+		# 		"msg": "something happened, try again"				
+		# 	}), 400
 			
 		user_update = User.query.filter_by(id=user_id).first()
 		
@@ -80,10 +80,13 @@ def handle_user(user_id = None):
 				"msg": "User not found"
 			}), 404
 
-		user = User(email=body["email"], password=body["password"])	
+		user = User(nombre=body["nombre"], email=body["email"], direccion=body["direccion"], telefono=body["telefono"])	
 		try:
 		
+			user_update.nombre = body.get("nombre")
 			user_update.email = body.get("email")
+			user_update.direccion = body.get("direccion")
+			user_update.telefono = body.get("telefono")
 			db.session.commit()
 			return jsonify(user.serialize()), 201
 		except Exception as error:
