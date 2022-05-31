@@ -248,8 +248,8 @@ class OrdenServicio(db.Model):
     status_orden_recibida = db.Column(db.Boolean)
     status_orden_cancelada = db.Column(db.Boolean)
     status_orden_aceptada = db.Column(db.Boolean)
-    status_orden_progreso = db.Column(db.Boolean) 
-    comentario = db.Column(db.String(250))
+    status_orden_progreso = db.Column(db.Boolean)
+    comentario = db.Column(db.String(250)) 
     #Defining Foreign Keys
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
     cliente_id = db.Column(db.Integer, db.ForeignKey("user.id"))
