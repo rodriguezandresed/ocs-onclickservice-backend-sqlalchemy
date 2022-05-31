@@ -276,7 +276,7 @@ class OrdenServicio(db.Model):
             "proveedor":self.proveedor.simplify(),
             "cliente":self.cliente.simplify(),
             "orden_detalle_servicio":self.detalle_servicio.serialize(),
-            "commentario":self.comentario,
+            "comentario":self.comentario,
         }
 
     def __init__(self, *args, **kwargs):
