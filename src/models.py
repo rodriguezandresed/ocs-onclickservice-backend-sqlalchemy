@@ -143,8 +143,8 @@ class TipoServicio(db.Model):
 
     def __init__(self, *args, **kwargs):
         """
-            "name":"andres",
-            "lastname":"rodriguez"
+            "name":"",
+            "lastname":""
 
 
         """
@@ -220,8 +220,8 @@ class EvaluacionProveedor(db.Model):
 
     def __init__(self, *args, **kwargs):
         """
-            "name":"andres",
-            "lastname":"rodriguez"
+            "name":"",
+            "lastname":""
 
 
         """
@@ -249,6 +249,7 @@ class OrdenServicio(db.Model):
     status_orden_cancelada = db.Column(db.Boolean)
     status_orden_aceptada = db.Column(db.Boolean)
     status_orden_progreso = db.Column(db.Boolean) 
+    comentario = db.Column(db.String(250))
     #Defining Foreign Keys
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
     cliente_id = db.Column(db.Integer, db.ForeignKey("user.id"))
@@ -275,12 +276,13 @@ class OrdenServicio(db.Model):
             "proveedor":self.proveedor.simplify(),
             "cliente":self.cliente.simplify(),
             "orden_detalle_servicio":self.detalle_servicio.serialize(),
+            "comentario":self.comentario,
         }
 
     def __init__(self, *args, **kwargs):
         """
-            "name":"andres",
-            "lastname":"rodriguez"
+            "name":"",
+            "lastname":""
 
 
         """
@@ -334,8 +336,8 @@ class SolicitudEdo(db.Model):
 
     def __init__(self, *args, **kwargs):
         """
-            "name":"andres",
-            "lastname":"rodriguez"
+            "name":"",
+            "lastname":""
 
 
         """
