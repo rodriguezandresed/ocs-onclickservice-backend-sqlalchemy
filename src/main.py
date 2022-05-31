@@ -453,13 +453,14 @@ def handle_edit_orden_cliente(user_id = None):
 				"msg": "No se encuentra el servicio"
 			}), 404
 
-		servicio = OrdenServicio(status_orden_recibida=body["status_orden_recibida"], status_orden_cancelada=body["status_orden_cancelada"],status_orden_aceptada=body["status_orden_aceptada"] )
+		servicio = OrdenServicio(status_orden_recibida=body["status_orden_recibida"], status_orden_cancelada=body["status_orden_cancelada"],status_orden_aceptada=body["status_orden_aceptada"], comentario = body["comentario"] )
 		
 		try:
 
 			service_update.status_orden_recibida = body.get("status_orden_recibida")
 			service_update.status_orden_cancelada = body.get("status_orden_cancelada")
 			service_update.status_orden_aceptada = body.get("status_orden_aceptada")
+			service_update.comentario = body.get("comentario")
 			db.session.commit()
 			return jsonify(user.serialize()), 201
 		except Exception as error:
