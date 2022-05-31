@@ -366,6 +366,7 @@ def handle_edit_orden_proveedor(user_id = None):
 	user = get_jwt_identity()
 	body = request.json
 	body_cliente=body.get("cliente_id", None)
+	body_id=body.get("id", None)
 	cliente_asignado = User.query.filter_by(id=body_cliente).first()
 	print(cliente_asignado)
 	if request.method == 'PUT':
@@ -383,9 +384,13 @@ def handle_edit_orden_proveedor(user_id = None):
 			return jsonify({
 				"msg": "something happened, try again"
 			}), 400
-			
+		if body.get("id") is None:
+			return jsonify({
+				"msg": "something happened, try again"
+			}), 400
 
-		service_update = OrdenServicio.query.filter_by(proveedor_id=user, cliente_id=cliente_asignado.id).first()
+
+		service_update = OrdenServicio.query.filter_by(proveedor_id=user, cliente_id=cliente_asignado.id, id=body_id).first()
 
 		if service_update is None:
 			return jsonify({
@@ -414,7 +419,8 @@ def handle_edit_orden_cliente(user_id = None):
 	body = request.json
 	body_proveedor=body.get("proveedor_id", None)
 	proveedor_asignado = User.query.filter_by(id=body_proveedor).first()
-
+	body_id=body.get("id", None)
+	print(proveedor_asignado)
 	if request.method == 'PUT':
 		if  body.get("status_orden_recibida") is None:
 			return jsonify({
@@ -430,9 +436,14 @@ def handle_edit_orden_cliente(user_id = None):
 			return jsonify({
 				"msg": "something happened, try again"
 			}), 400
+
+		if body.get("id") is None:
+			return jsonify({
+				"msg": "something happened, try again"
+			}), 400
 			
 
-		service_update = OrdenServicio.query.filter_by(proveedor_id=proveedor_asignado.id, cliente_id=user).first()
+		service_update = OrdenServicio.query.filter_by(proveedor_id=proveedor_asignado.id, cliente_id=user, id=body_id).first()
 
 		if service_update is None:
 			return jsonify({
