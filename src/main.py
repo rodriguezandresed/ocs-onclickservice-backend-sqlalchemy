@@ -539,14 +539,14 @@ def handle_evaluacion():
 
 	body=request.json
 	body_service=body.get("nombre_tipo_servicio", None)
-	body_proveedor=body.get("nombre_proveedor", None)
-
+	body_proveedor=body.get("proveedor_id", None)
 
 	if body_service is not  None:
 		user = get_jwt_identity()
 		cliente_asignado = User.query.filter_by(id=user).first()
 		print(cliente_asignado)
-		proveedor_asignado = User.query.filter_by(nombre=body_proveedor).first()
+		proveedor_asignado = User.query.filter_by(id=body_proveedor).first()
+		print(proveedor_asignado)
 		servicio = TipoServicio.query.filter_by(nombre_tipo_servicio=body_service,  proveedor_id=proveedor_asignado.id ).first()
 		#orden_servicio= OrdenServicio.query.filter_by(detalle_servicio_id=servicio.id, cliente_id=cliente_asignado.id, proveedor_id=proveedor_asignado.id).first()
 		#falta hacer una logica con la orden de servicio
@@ -558,7 +558,7 @@ def handle_evaluacion():
 								"msg":"La evaluacion por este servicio ya existe en tu perfil!"
 							})
 					else:
-						evaluacion_proveedor = EvaluacionProveedor(detalle_servicio_id=servicio.id, proveedor_evaluado_id=proveedor_asignado.id, cliente_evaluador_id=cliente_asignado.id, resultado_evaluacion=body["resultado_evaluacion"], comentario=body["comentario"])	
+						evaluacion_proveedor = EvaluacionProveedor(detalle_servicio_id=servicio.id, proveedor_evaluado_id=proveedor_asignado.id, cliente_evaluador_id=cliente_asignado.id, resultado_evaluacion=body["resultado_evaluacion"])	
 						print(evaluacion_proveedor)
 						try:
 							db.session.add(evaluacion_proveedor)
