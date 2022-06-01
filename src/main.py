@@ -314,7 +314,7 @@ def handle_add_orden():
 								"msg":"La orden por este servicio ya existe en tu perfil!"
 							})
 					else:
-						orden = OrdenServicio(detalle_servicio_id=servicio.id, proveedor_id=proveedor_asignado.id, cliente_id=cliente_asignado.id, status_orden_progreso=True)	
+						orden = OrdenServicio(detalle_servicio_id=servicio.id, proveedor_id=proveedor_asignado.id, cliente_id=cliente_asignado.id, status_orden_progreso=True, status_orden_recibida=False, status_orden_aceptada=False,status_orden_cancelada=False )	
 						print(orden)
 						try:
 							db.session.add(orden)
