@@ -249,6 +249,7 @@ class OrdenServicio(db.Model):
     status_orden_cancelada = db.Column(db.Boolean)
     status_orden_aceptada = db.Column(db.Boolean)
     status_orden_progreso = db.Column(db.Boolean)
+    status_orden_finalizada = db.Column(db.Boolean)
     comentario = db.Column(db.String(250)) 
     #Defining Foreign Keys
     detalle_servicio_id = db.Column(db.Integer, db.ForeignKey('tipo_servicio.id') )
@@ -272,6 +273,7 @@ class OrdenServicio(db.Model):
             "status_orden_aceptada":self.status_orden_aceptada,
             "status_orden_progreso":self.status_orden_progreso,
             "status_orden_cancelada":self.status_orden_cancelada,
+            "status_orden_finalizada":self.status_orden_finalizada,
             "detalle_servicio_id":self.detalle_servicio_id,
             "proveedor":self.proveedor.simplify(),
             "cliente":self.cliente.simplify(),
