@@ -310,7 +310,7 @@ def handle_add_orden():
 								"msg":"La orden por este servicio ya existe en tu perfil!"
 							})
 					else:
-						orden = OrdenServicio(detalle_servicio_id=servicio.id, proveedor_id=proveedor_asignado.id, cliente_id=cliente_asignado.id, status_orden_progreso=True, status_orden_recibida=False, status_orden_aceptada=False,status_orden_cancelada=False )	
+						orden = OrdenServicio(detalle_servicio_id=servicio.id, proveedor_id=proveedor_asignado.id, cliente_id=cliente_asignado.id, status_orden_progreso=True, status_orden_recibida=False, status_orden_aceptada=False,status_orden_cancelada=False, status_orden_finalizada=False )	
 						try:
 							db.session.add(orden)
 							db.session.commit()
@@ -347,7 +347,7 @@ def handle_contratos_pendientes():
 def handle_pedidos_pendientes():
 	if request.method == 'GET':
 		user = get_jwt_identity()
-		pedidos = OrdenServicio.query.filter_by(cliente_id=user, status_orden_progreso=True, status_orden_finalizada=False, status_orden_recibida=False, status_orden_aceptada=False, status_orden_cancelada=False ).all()
+		pedidos = OrdenServicio.query.filter_by(cliente_id=user, status_orden_progreso=True).all()
 		pedidos_existentes = list(map(lambda pedido: pedido.serialize(), pedidos))
 		if len(pedidos) > 0:
 			return jsonify(pedidos_existentes),200
