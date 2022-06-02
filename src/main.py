@@ -137,7 +137,6 @@ def handle_login():
 	if email is not  None and password is not None:
 		user = User.query.filter_by(email=email, password=password).one_or_none()
 		if user is not None:
-			print(user.id)
 			create_token=create_access_token(identity=user.id)
 			return jsonify(
 				{
@@ -194,7 +193,6 @@ def handle_add_servicio():
 						try:
 							db.session.add(servicio)
 							db.session.commit()
-							print(servicio)
 							return jsonify(servicio.serialize()), 201
 						except Exception as error:
 							db.session.rollback()
@@ -220,7 +218,6 @@ def handle_proveedores(tipo_servicio = None):
 			#servicios = TipoServicio.query.filter_by(proveedor_id=user_id).all()
 			servicios = TipoServicio.query.filter_by(nombre_tipo_servicio=tipo_servicio).all()
 			servicios = list(map(lambda servicio: servicio.serialize(), servicios))
-			print(servicios)
 			if servicios is not None:
 				return jsonify(servicios),200
 			else:
@@ -308,14 +305,12 @@ def handle_add_orden():
 
 		if user is not None:
 					orden_servicio= OrdenServicio.query.filter_by(detalle_servicio_id=servicio.id, cliente_id=cliente_asignado.id, proveedor_id=proveedor_asignado.id).first()
-					print(orden_servicio)
 					if orden_servicio is not None:
 							return jsonify({
 								"msg":"La orden por este servicio ya existe en tu perfil!"
 							})
 					else:
 						orden = OrdenServicio(detalle_servicio_id=servicio.id, proveedor_id=proveedor_asignado.id, cliente_id=cliente_asignado.id, status_orden_progreso=True, status_orden_recibida=False, status_orden_aceptada=False,status_orden_cancelada=False )	
-						print(orden)
 						try:
 							db.session.add(orden)
 							db.session.commit()
@@ -352,7 +347,7 @@ def handle_contratos_pendientes():
 def handle_pedidos_pendientes():
 	if request.method == 'GET':
 		user = get_jwt_identity()
-		pedidos = OrdenServicio.query.filter_by(cliente_id=user, status_orden_progreso=True).all()
+		pedidos = OrdenServicio.query.filter_by(cliente_id=user, status_orden_progreso=True, status_orden_finalizada=False, status_orden_recibida=False, status_orden_aceptada=False, status_orden_cancelada=False ).all()
 		pedidos_existentes = list(map(lambda pedido: pedido.serialize(), pedidos))
 		if len(pedidos) > 0:
 			return jsonify(pedidos_existentes),200
@@ -371,7 +366,6 @@ def handle_edit_orden_proveedor(user_id = None):
 	body_cliente=body.get("cliente_id", None)
 	body_id=body.get("id", None)
 	cliente_asignado = User.query.filter_by(id=body_cliente).first()
-	print(cliente_asignado)
 	if request.method == 'PUT':
 		if body.get("status_orden_recibida") is None:
 			return jsonify({
@@ -423,7 +417,6 @@ def handle_edit_orden_cliente(user_id = None):
 	body_proveedor=body.get("proveedor_id", None)
 	proveedor_asignado = User.query.filter_by(id=body_proveedor).first()
 	body_id=body.get("id", None)
-	print(proveedor_asignado)
 	if request.method == 'PUT':
 		
 		if  body.get("comentario") is None:
@@ -518,7 +511,6 @@ def handle_solicitud_servicios():
 						try:
 							db.session.add(solicitud_edo)
 							db.session.commit()
-							print(solicitud_edo)
 							return jsonify(solicitud_edo.serialize()), 201
 						except Exception as error:
 							db.session.rollback()
@@ -544,22 +536,18 @@ def handle_evaluacion():
 	if body_service is not  None:
 		user = get_jwt_identity()
 		cliente_asignado = User.query.filter_by(id=user).first()
-		print(cliente_asignado)
 		proveedor_asignado = User.query.filter_by(id=body_proveedor).first()
-		print(proveedor_asignado)
 		servicio = TipoServicio.query.filter_by(nombre_tipo_servicio=body_service,  proveedor_id=proveedor_asignado.id ).first()
 		#orden_servicio= OrdenServicio.query.filter_by(detalle_servicio_id=servicio.id, cliente_id=cliente_asignado.id, proveedor_id=proveedor_asignado.id).first()
 		#falta hacer una logica con la orden de servicio
 		if user is not None:
 					evaluacion_proveedor= EvaluacionProveedor.query.filter_by(detalle_servicio_id=servicio.id, cliente_evaluador_id=cliente_asignado.id, proveedor_evaluado_id=proveedor_asignado.id).first()
-					print(evaluacion_proveedor)
 					if evaluacion_proveedor is not None:
 							return jsonify({
 								"msg":"La evaluacion por este servicio ya existe en tu perfil!"
 							})
 					else:
 						evaluacion_proveedor = EvaluacionProveedor(detalle_servicio_id=servicio.id, proveedor_evaluado_id=proveedor_asignado.id, cliente_evaluador_id=cliente_asignado.id, resultado_evaluacion=body["resultado_evaluacion"])	
-						print(evaluacion_proveedor)
 						try:
 							db.session.add(evaluacion_proveedor)
 							db.session.commit()
